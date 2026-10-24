@@ -48,14 +48,16 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
 
 ---
 
-## 🛠️ How We Built & Fixed It (Antigravity AI + Video Capture)
+## 🛠️ How We Built & Fixed It (Antigravity AI + Hardware Loop)
 
 Designed and debugged by **Tslrs** (Hardware & Architecture) collaborating with **Google Antigravity** (AI Engineering Partner):
 
-* **1. Fixed the SD Card Reading**:  
-  The original project struggled to read the MicroSD card under modern Gowin EDA. We fixed the FPGA IO constraints and SPI bus pull-ups so the Tang Nano 9K reliably detects and boots FreeDOS from the TF slot every single time (using Raspberry Pi Imager).
+* **1. Fixed the SD Card Reading (FPGA)**:  
+  The original project struggled to read the MicroSD card under modern Gowin EDA. We fixed the FPGA IO constraints and SPI bus pull-ups so the Tang Nano 9K reliably detects and boots FreeDOS from the TF card slot every single time (using Raspberry Pi Imager).
 * **2. Fixed the Keyboard via HDMI Capture**:  
-  To solve the keyboard lag without expensive lab tools, we plugged the Tang Nano 9K HDMI output into a budget **DM-HF200 USB Video Capture Card**. Antigravity captured live screen frames in real-time, watched FreeDOS execute commands on screen, and tuned the ESP32 machine code to an exact **12.5 kHz** PS/2 clock so every keystroke executes instantly with zero lag!
+  To solve keyboard timing issues without expensive lab tools, we plugged the Tang Nano 9K HDMI output into a budget **DM-HF200 USB Video Capture Card**. Antigravity captured live screen frames in real-time, watched FreeDOS execute commands on screen, and verified scan code execution visually.
+* **3. Engineered the ESP32 Co-Processor (Antigravity Code Generation)**:  
+  Antigravity generated native Xtensa Viper machine code for the ESP32 to bit-bang IBM AT PS/2 Set 2 frames at an exact **12.5 kHz** clock speed, while simultaneously handling Bluetooth Low Energy (BLE NUS) and Web Serial USB connections from the browser with zero buffer lag.
 
 ---
 
