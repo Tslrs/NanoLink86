@@ -1,0 +1,13 @@
+# GitHub Linguist Overrides
+# Gowin FPGA Bitstream files (*.fs) are binary hardware bitstreams, NOT Microsoft F# code
+*.fs binary linguist-detectable=false
+
+# Binary firmware, disk images, and ROMs
+*.bin binary linguist-detectable=false
+*.rom binary linguist-detectable=false
+*.zip binary linguist-detectable=false
+*.img binary linguist-detectable=false
+
+# Hardware RTL & Firmware Languages
+*.v linguist-detectable=true linguist-language=Verilog
+*.py linguist-detectable=true linguist-language=Python

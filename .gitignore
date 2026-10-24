@@ -1,2 +1,4 @@
 *.log
 .DS_Store
+current_screen.jpg
+server.py
