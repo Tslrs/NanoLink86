@@ -161,7 +161,7 @@ NanoLink86/
 This project uses a clear **Component-Based License Structure**:
 
 1. **NanoLink86 Original Code (Web Controller, ESP32 Firmware & Scripts)**:
-   * Licensed under the **[MIT License](LICENSE)** © 2026 Nick Tsalaris (Tslrs).
+   * Licensed under the **[MIT License](LICENSE)** © 2026 Tslrs.
    * Free for any personal, educational, or commercial use.
 
 2. **Next186 SoC Core & FPGA RTL (`fpga/src/`, `fpga/BIOS/`)**:
@@ -171,5 +171,5 @@ This project uses a clear **Component-Based License Structure**:
 ### ⚠️ Strict "AS IS" Disclaimer (No Warranty)
 > **DISCLAIMER:**  
 > All software, bitstreams, schematics, and firmware in this repository are provided strictly on an **"AS IS"** basis, **WITHOUT WARRANTY OF ANY KIND**.  
-> In no event shall the author (Nick Tsalaris) or contributors be held liable for any damages, hardware failure (FPGA, ESP32, monitors), electrical shorts, or data loss arising from the use or flashing of this project.  
+> In no event shall the author (Tslrs) or contributors be held liable for any damages, hardware failure (FPGA, ESP32, monitors), electrical shorts, or data loss arising from the use or flashing of this project.  
 > **You wire, flash, and operate all hardware entirely at your own risk.** See the full [LICENSE](LICENSE) for complete terms.
