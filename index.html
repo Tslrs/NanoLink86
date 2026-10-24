@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NanoLink86 · Multi-Mode Hardware Controller</title>
+<style>
+:root {
+  --bg-primary: #090a0d;
+  --bg-surface: #101318;
+  --bg-card: #151921;
+  --bg-subtle: #1c222d;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(245, 158, 11, 0.5);
+  --border-focus: #f59e0b;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #64748b;
+  --tang-amber: #f59e0b;
+  --tang-amber-dim: rgba(245, 158, 11, 0.12);
+  --tang-amber-border: rgba(245, 158, 11, 0.3);
+  --status-online: #10b981;
+  --status-offline: #ef4444;
+  --font-mono: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-badge {
+  background: var(--tang-amber-dim);
+  border: 1px solid var(--tang-amber-border);
+  color: var(--tang-amber);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+}
+
+.title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.status-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-offline);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.status-indicator.online {
+  background: var(--status-online);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+main {
+  max-width: 980px;
+  width: 100%;
+  margin: 16px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+/* Transport Mode Switcher */
+.transport-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transport-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.transport-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.transport-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  background: var(--bg-subtle);
+  color: #fff;
+  border-color: #4b5563;
+}
+
+.tab-btn.active {
+  background: var(--tang-amber-dim);
+  border-color: var(--tang-amber);
+  color: var(--tang-amber);
+}
+
+.action-btn {
+  background: var(--tang-amber);
+  border: 1px solid var(--tang-amber);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.action-btn:hover {
+  background: #d97706;
+}
+
+.action-btn.disconnect {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fca5a5;
+}
+
+.action-btn.disconnect:hover {
+  background: #991b1b;
+}
+
+/* Hardware Profile Bar */
+.hw-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.spec-cell {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.spec-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+
+.spec-value {
+  font-size: 0.84rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Direct Key Capture Console */
+.hardware-arena {
+  background: #060709;
+  border: 1px solid #333a46;
+  border-radius: 6px;
+  padding: 22px 20px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.hardware-arena:hover {
+  border-color: #4b5563;
+}
+
+.hardware-arena:focus {
+  border-color: var(--tang-amber);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.18);
+}
+
+.arena-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--tang-amber);
+  background: var(--tang-amber-dim);
+  border: 1px solid var(--tang-amber-border);
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+
+.arena-headline {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.arena-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.key-telemetry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.key-display {
+  display: inline-block;
+  background: var(--bg-card);
+  border: 1px solid #374151;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 6px 18px;
+  border-radius: 6px;
+  min-width: 120px;
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+
+.key-display.active {
+  background: var(--tang-amber);
+  color: #000;
+  border-color: var(--tang-amber);
+  transform: scale(0.96);
+}
+
+.quick-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.btn-ctrl {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-ctrl:hover {
+  background: var(--bg-subtle);
+  border-color: #4b5563;
+  color: #fff;
+}
+
+.btn-ctrl:active {
+  transform: translateY(1px);
+}
+
+.btn-swap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--tang-amber);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.12s ease;
+}
+
+.btn-swap:hover {
+  border-color: var(--tang-amber);
+  background: var(--tang-amber-dim);
+}
+
+/* Telemetry Log */
+.telemetry-box {
+  background: #060709;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  height: 200px;
+  overflow-y: auto;
+  line-height: 1.45;
+}
+
+.log-entry {
+  margin-bottom: 2px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.hint-banner {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="logo-badge">NANOLINK86</span>
+    <div class="title-group">
+      <div class="title">NanoLink86 Controller</div>
+      <div class="subtitle">Tang Nano 9K (Gowin GW1NR-9C) · Next186 SoC FreeDOS</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-pill">
+      <span class="status-indicator" id="status-dot"></span>
+      <span id="lbl-status">DISCONNECTED</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Pure Static Web Transport Panel (Zero Python Required) -->
+  <div class="transport-card">
+    <div class="transport-header">
+      <span class="transport-title">Connection Transport</span>
+      <span id="transport-badge" style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--tang-amber);">GitHub Pages Ready · Pure Client-Side</span>
+    </div>
+    <div class="transport-tabs">
+      <button class="tab-btn active" id="tab-ble" onclick="selectMode('ble')">
+        <span>⚡ Bluetooth (BLE Wireless)</span>
+      </button>
+      <button class="tab-btn" id="tab-serial" onclick="selectMode('serial')">
+        <span>🔌 Web Serial (USB Cable)</span>
+      </button>
+
+      <div style="margin-left: auto; display: flex; gap: 8px;">
+        <button class="action-btn" id="btn-connect" onclick="connectActiveMode()">Connect BLE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hardware Profile Bar -->
+  <div class="hw-specs">
+    <div class="spec-cell">
+      <div class="spec-label">Target FPGA</div>
+      <div class="spec-value">GW1NR-LV9QN88PC6/I5</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label">Active Transport</div>
+      <div class="spec-value" id="lbl-active-transport">BLE Wireless</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label">Bus Protocol</div>
+      <div class="spec-value">PS/2 Set 2 (12.5 kHz)</div>
+    </div>
+    <div class="spec-cell">
+      <div class="spec-label">GPIO Pin Mapping</div>
+      <div class="spec-value" id="lbl-pins">CLK: 18 | DAT: 19</div>
+    </div>
+  </div>
+
+  <!-- Browser & Platform Compatibility Hint -->
+  <div class="hint-banner" id="hint-banner">
+    <span id="hint-text">⚡ BLE Mode: Works in Safari iOS (Bluefy / WebBLE app), macOS Chrome/Edge, and Android.</span>
+    <span style="opacity: 0.6;">Zero Drivers Needed</span>
+  </div>
+
+  <!-- Hardware Live Key Capture Card -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Live Hardware Console</span>
+      <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">Real-Time Xtensa Stream</span>
+    </div>
+
+    <div id="hardware-arena" class="hardware-arena" tabindex="0">
+      <div class="arena-state">DIRECT STREAM ACTIVE</div>
+      <div class="arena-headline">Click here and type directly</div>
+      <div class="arena-desc">Keystrokes are transmitted instantly with zero buffering to the Next186 FreeDOS engine.</div>
+      
+      <div class="key-telemetry">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">LAST KEY:</span>
+        <div id="key-display" class="key-display">IDLE</div>
+      </div>
+    </div>
+
+    <!-- Quick Control Bar -->
+    <div class="quick-controls">
+      <button class="btn-ctrl" onclick="sendMacro('DIR')">DIR [ENTER]</button>
+      <button class="btn-ctrl" onclick="sendMacro('CLS')">CLS [ENTER]</button>
+      <button class="btn-ctrl" onclick="sendMacro('VER')">VER [ENTER]</button>
+      <button class="btn-ctrl" onclick="sendMacro('HELP')">HELP [ENTER]</button>
+      <button class="btn-ctrl" onclick="sendRawKey('Enter')">ENTER</button>
+      <button class="btn-ctrl" onclick="sendRawKey('Backspace')">BACKSPACE</button>
+      <button class="btn-ctrl" onclick="sendRawKey('Space')">SPACE</button>
+      <button class="btn-ctrl" onclick="sendRawKey('Escape')">ESC</button>
+      <button class="btn-ctrl" onclick="sendRawKey('Tab')">TAB</button>
+      <button class="btn-swap" onclick="swapPins()">SWAP CLK/DAT</button>
+    </div>
+  </div>
+
+  <!-- Hardware Telemetry Log -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Telemetry & Diagnostics Stream</span>
+      <button class="btn-ctrl" style="padding: 3px 8px; font-size: 0.7rem;" onclick="clearLogs()">Clear</button>
+    </div>
+    <div class="telemetry-box" id="telemetry-logs"></div>
+  </div>
+</main>
+
+<footer>
+  NanoLink86 · Sipeed Tang Nano 9K (Gowin GW1NR-9C) · Next186 SoC FreeDOS Controller
+</footer>
+
+<script>
+// -------------------------------------------------------------
+// NanoLink86 Multi-Mode Transport Engine
+// -------------------------------------------------------------
+const NUS_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const NUS_RX_UUID      = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+const NUS_TX_UUID      = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+let currentMode = 'ble'; // 'ble' | 'serial' | 'bridge'
+let isConnected = false;
+
+// Bluetooth Handles
+let bleDevice = null;
+let bleServer = null;
+let bleRxChar = null;
+let bleTxChar = null;
+
+// Web Serial Handles
+let serialPort = null;
+let serialWriter = null;
+let serialReader = null;
+
+// DOM Elements
+const arena = document.getElementById('hardware-arena');
+const keyDisplay = document.getElementById('key-display');
+const telemetryBox = document.getElementById('telemetry-logs');
+const lblStatus = document.getElementById('lbl-status');
+const statusDot = document.getElementById('status-dot');
+const lblActiveTransport = document.getElementById('lbl-active-transport');
+const lblPins = document.getElementById('lbl-pins');
+const btnConnect = document.getElementById('btn-connect');
+const hintText = document.getElementById('hint-text');
+
+function logTelemetry(msg) {
+  const time = new Date().toTimeString().split(' ')[0];
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerText = `[${time}] ${msg}`;
+  telemetryBox.appendChild(div);
+  telemetryBox.scrollTop = telemetryBox.scrollHeight;
+}
+
+function clearLogs() {
+  telemetryBox.innerHTML = '';
+}
+
+function updateConnectionUI(connected, label) {
+  isConnected = connected;
+  if (connected) {
+    statusDot.classList.add('online');
+    lblStatus.innerText = label || 'ONLINE';
+    btnConnect.innerText = 'Disconnect';
+    btnConnect.classList.add('disconnect');
+  } else {
+    statusDot.classList.remove('online');
+    lblStatus.innerText = 'DISCONNECTED';
+    btnConnect.classList.remove('disconnect');
+    btnConnect.innerText = (currentMode === 'ble') ? 'Connect BLE' : 'Connect Serial';
+  }
+}
+
+// Mode Selection
+function selectMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-ble').classList.toggle('active', mode === 'ble');
+  document.getElementById('tab-serial').classList.toggle('active', mode === 'serial');
+
+  if (mode === 'ble') {
+    lblActiveTransport.innerText = 'BLE Wireless (NUS)';
+    btnConnect.innerText = isConnected ? 'Disconnect' : 'Connect BLE';
+    hintText.innerText = '⚡ BLE Mode: Works in Safari iOS (Bluefy / WebBLE app), macOS Chrome/Edge, and Android.';
+  } else {
+    lblActiveTransport.innerText = 'Web Serial (USB CP2102)';
+    btnConnect.innerText = isConnected ? 'Disconnect' : 'Connect Serial';
+    hintText.innerText = '🔌 Web Serial: Direct USB via Chrome, Edge, Opera. Zero Python server required!';
+  }
+}
+
+async function connectActiveMode() {
+  if (isConnected) {
+    disconnectActiveMode();
+    return;
+  }
+
+  if (currentMode === 'ble') {
+    await connectBLE();
+  } else {
+    await connectSerial();
+  }
+}
+
+function disconnectActiveMode() {
+  if (currentMode === 'ble' && bleDevice && bleDevice.gatt.connected) {
+    bleDevice.gatt.disconnect();
+    logTelemetry('BLE Disconnected by user');
+  } else if (currentMode === 'serial' && serialPort) {
+    try {
+      if (serialWriter) serialWriter.releaseLock();
+      if (serialReader) serialReader.cancel();
+      serialPort.close();
+    } catch(e) {}
+    serialPort = null;
+    logTelemetry('Web Serial Disconnected by user');
+    updateConnectionUI(false);
+  }
+}
+
+// -------------------------------------------------------------
+// 1. Web Bluetooth Implementation
+// -------------------------------------------------------------
+async function connectBLE() {
+  if (!navigator.bluetooth) {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const msg = isSafari
+      ? '❌ Safari does not support Web Bluetooth (blocked by Apple).\n\n👉 On Mac: Open this page in Google Chrome or Microsoft Edge.\n👉 On iPhone/iPad: Open this page in the Bluefy app from the App Store.'
+      : '❌ Web Bluetooth is not supported or is disabled in your current browser.\nPlease use Google Chrome or Microsoft Edge.';
+    alert(msg);
+    logTelemetry(msg);
+    return;
+  }
+
+  try {
+    logTelemetry('Opening Bluetooth Device Chooser...');
+    
+    // Request device with primary name filter, fallback to acceptAllDevices
+    try {
+      bleDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ name: 'NanoLink86' }, { namePrefix: 'Nano' }],
+        optionalServices: [NUS_SERVICE_UUID]
+      });
+    } catch (filterErr) {
+      logTelemetry(`Name filter retry: showing all devices (${filterErr.message})`);
+      bleDevice = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [NUS_SERVICE_UUID]
+      });
+    }
+
+    bleDevice.addEventListener('gattserverdisconnected', () => {
+      logTelemetry('⚠️ BLE Connection lost');
+      updateConnectionUI(false);
+    });
+
+    logTelemetry(`Connecting to GATT server (${bleDevice.name})...`);
+    bleServer = await bleDevice.gatt.connect();
+
+    logTelemetry('Discovering Nordic UART Service...');
+    const service = await bleServer.getPrimaryService(NUS_SERVICE_UUID);
+
+    logTelemetry('Obtaining RX & TX characteristics...');
+    bleRxChar = await service.getCharacteristic(NUS_RX_UUID);
+    bleTxChar = await service.getCharacteristic(NUS_TX_UUID);
+
+    await bleTxChar.startNotifications();
+    bleTxChar.addEventListener('characteristicvaluechanged', (e) => {
+      const dec = new TextDecoder().decode(e.target.value);
+      logTelemetry(`📥 BLE: ${dec.trim()}`);
+      parseStatusLine(dec);
+    });
+
+    updateConnectionUI(true, 'BLE CONNECTED');
+    logTelemetry('✅ BLE Wireless Link 100% Operational!');
+    await sendTransportCommand('STATUS');
+    arena.focus();
+  } catch (err) {
+    logTelemetry(`❌ BLE Error: ${err.message || err}`);
+    updateConnectionUI(false);
+  }
+}
+
+// -------------------------------------------------------------
+// 2. Web Serial Implementation
+// -------------------------------------------------------------
+async function connectSerial() {
+  if (!navigator.serial) {
+    alert('Web Serial API is not supported in this browser.\nPlease use Google Chrome, Microsoft Edge, or Opera.');
+    return;
+  }
+
+  try {
+    logTelemetry('Requesting USB Serial Port (CP2102)...');
+    serialPort = await navigator.serial.requestPort();
+    await serialPort.open({ baudRate: 115200 });
+
+    const encoder = new TextEncoderStream();
+    encoder.readable.pipeTo(serialPort.writable);
+    serialWriter = encoder.writable.getWriter();
+
+    readSerialLoop();
+
+    updateConnectionUI(true, 'USB SERIAL');
+    logTelemetry('✅ Web Serial connected directly at 115200 baud!');
+    await sendTransportCommand('STATUS');
+    arena.focus();
+  } catch (err) {
+    logTelemetry(`❌ Serial Error: ${err.message || err}`);
+    updateConnectionUI(false);
+  }
+}
+
+async function readSerialLoop() {
+  try {
+    const decoder = new TextDecoderStream();
+    serialPort.readable.pipeTo(decoder.writable);
+    serialReader = decoder.readable.getReader();
+    let buffer = '';
+
+    while (true) {
+      const { value, done } = await serialReader.read();
+      if (done) break;
+      if (value) {
+        buffer += value;
+        const lines = buffer.split('\r\n');
+        buffer = lines.pop();
+        for (const l of lines) {
+          if (l.trim()) {
+            logTelemetry(`📥 SERIAL: ${l.trim()}`);
+            parseStatusLine(l);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    logTelemetry(`Serial read closed: ${err}`);
+    updateConnectionUI(false);
+  }
+}
+
+function parseStatusLine(line) {
+  if (line.includes('PINS:CLK=')) {
+    try {
+      const parts = line.split('PINS:CLK=')[1].split(',DAT=');
+      lblPins.innerText = `CLK: ${parts[0]} | DAT: ${parts[1]}`;
+    } catch(e) {}
+  }
+}
+
+// -------------------------------------------------------------
+// Unified Hardware Dispatcher
+// -------------------------------------------------------------
+async function sendTransportCommand(cmd) {
+  const payload = cmd + '\r\n';
+
+  if (currentMode === 'ble') {
+    if (!bleRxChar) {
+      logTelemetry('⚠️ BLE not connected. Click "Connect BLE" first.');
+      return false;
+    }
+    try {
+      const encoder = new TextEncoder();
+      await bleRxChar.writeValue(encoder.encode(payload));
+      return true;
+    } catch(e) {
+      logTelemetry(`❌ BLE Send failed: ${e.message}`);
+      return false;
+    }
+  } else {
+    // Web Serial
+    if (!serialWriter) {
+      logTelemetry('⚠️ Web Serial not connected. Click "Connect Serial" first.');
+      return false;
+    }
+    try {
+      await serialWriter.write(payload);
+      return true;
+    } catch(e) {
+      logTelemetry(`❌ Serial Send failed: ${e.message}`);
+      return false;
+    }
+  }
+}
+
+async function sendRawKey(key) {
+  // Update Key HUD Display
+  let label = key.toUpperCase();
+  if (key === ' ') label = 'SPACE';
+  else if (key === 'Enter') label = 'ENTER';
+  else if (key === 'Backspace') label = 'BKSP';
+  else if (key === 'Escape') label = 'ESC';
+  else if (key === 'Tab') label = 'TAB';
+
+  keyDisplay.innerText = label;
+  keyDisplay.classList.add('active');
+  setTimeout(() => keyDisplay.classList.remove('active'), 100);
+
+  if (key === 'Enter') return sendTransportCommand('ENTER');
+  if (key === 'Backspace') return sendTransportCommand('BKSP');
+  if (key === 'Escape') return sendTransportCommand('ESC');
+  if (key === 'Tab') return sendTransportCommand('TAB');
+  if (key === ' ' || key === 'Space') return sendTransportCommand('SPACE');
+  
+  if (key.length === 1) {
+    return sendTransportCommand(`K:${key}`);
+  }
+  return sendTransportCommand(key);
+}
+
+async function sendMacro(macro) {
+  logTelemetry(`🚀 Executing Macro: ${macro}`);
+  return sendTransportCommand(macro);
+}
+
+async function swapPins() {
+  logTelemetry('🔄 Requesting Pin Swap (CLK <-> DAT)...');
+  await sendTransportCommand('SWAP');
+}
+
+// -------------------------------------------------------------
+// Arena Key Listener & Initializer
+// -------------------------------------------------------------
+window.addEventListener('load', () => {
+  arena.focus();
+  logTelemetry('🚀 NanoLink86 Ready. Select "Bluetooth (BLE)" or "Web Serial (USB)" and click Connect.');
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('button') && !e.target.closest('.telemetry-box')) {
+    arena.focus();
+  }
+});
+
+arena.addEventListener('keydown', (e) => {
+  if (['Backspace', 'Tab', 'Enter', 'Escape', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  sendRawKey(e.key);
+});
+</script>
+
+</body>
+</html>
