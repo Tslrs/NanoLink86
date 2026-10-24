@@ -48,6 +48,25 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
 
 ---
 
+## 🔬 AI-Assisted Hardware-in-the-Loop Engineering (Google Antigravity & Video Capture)
+
+This project was architected, engineered, and brought to life through an advanced **Human-AI Collaborative Engineering Workflow** powered by **Google Antigravity**:
+
+* **Architect & Hardware Lead**: **Tslrs** (Conceptual architecture, hardware wiring, FPGA pinout decisions, project direction).
+* **Agentic AI Engineering Partner**: **Google Antigravity** (Native Xtensa machine code assembly generation, Gowin EDA constraint & timing fixes, Web Serial / Bluetooth stack, and closed-loop hardware verification).
+
+### 📹 The Breakthrough: Closed-Loop Optical Verification via DM-HF200 Video Capture
+Diagnosing low-level PS/2 timing and 8042 keyboard controller bugs on an FPGA without a \$1,000 oscilloscope or logic analyzer is notoriously difficult. To solve this, a novel **optical hardware-in-the-loop verification loop** was created:
+
+1. **Hardware Setup**: The Tang Nano 9K HDMI output was plugged directly into an affordable **DM-HF200 USB Video Capture Card (HDMI to USB-A)** connected to the host machine.
+2. **Real-Time Optical Feedback**: Antigravity took live video frame captures directly from the FreeDOS HDMI stream (`USB Video` feed) to visually verify:
+   * FreeDOS booting into the prompt (`C:\>`).
+   * Visual feedback of keystrokes typed into the web interface.
+   * Fine-tuning of the ESP32 native Viper machine code clock timing (`delay_cnt=220`, ~12.5 kHz) to eliminate missed scan codes and key bounce.
+3. **Result**: Real-time visual confirmation allowed iterative bug fixing in minutes, proving the immense power of agentic AI paired with low-cost video capture hardware for embedded systems engineering!
+
+---
+
 ## 📊 FPGA Resource Utilization (Gowin GW1NR-9C)
 
 Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
