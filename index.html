@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NanoLink86 · Multi-Mode Hardware Controller</title>
+<title>NanoLink86 · Direct Hardware Controller</title>
 <style>
 :root {
   --bg-primary: #090a0d;
@@ -95,7 +95,7 @@ header {
   gap: 7px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 6px;
   font-size: 0.78rem;
   font-family: var(--font-mono);
@@ -126,15 +126,15 @@ main {
   flex: 1;
 }
 
-/* Transport Mode Switcher */
+/* Direct Hardware Transport Panel */
 .transport-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  padding: 14px 18px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .transport-header {
@@ -152,65 +152,71 @@ main {
   font-family: var(--font-mono);
 }
 
-.transport-tabs {
+.transport-buttons {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.tab-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+.btn-conn {
+  flex: 1;
+  min-width: 220px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 8px 14px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 12px 18px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
   transition: all 0.15s ease;
+  letter-spacing: 0.02em;
 }
 
-.tab-btn:hover {
-  background: var(--bg-subtle);
-  color: #fff;
-  border-color: #4b5563;
+.btn-conn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
-.tab-btn.active {
-  background: var(--tang-amber-dim);
-  border-color: var(--tang-amber);
-  color: var(--tang-amber);
+.btn-conn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.action-btn {
+/* Primary USB Button */
+.btn-conn-serial {
   background: var(--tang-amber);
   border: 1px solid var(--tang-amber);
   color: #000;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.12s ease;
 }
 
-.action-btn:hover {
+.btn-conn-serial:hover:not(:disabled) {
   background: #d97706;
+  border-color: #d97706;
 }
 
-.action-btn.disconnect {
-  background: #7f1d1d;
-  border-color: #991b1b;
-  color: #fca5a5;
+/* Secondary BLE Button */
+.btn-conn-ble {
+  background: var(--bg-card);
+  border: 1px solid var(--tang-amber-border);
+  color: var(--tang-amber);
 }
 
-.action-btn.disconnect:hover {
-  background: #991b1b;
+.btn-conn-ble:hover:not(:disabled) {
+  background: var(--tang-amber-dim);
+  border-color: var(--tang-amber);
+}
+
+/* Active Disconnect State */
+.btn-conn.disconnect {
+  background: #7f1d1d !important;
+  border-color: #991b1b !important;
+  color: #fca5a5 !important;
+}
+
+.btn-conn.disconnect:hover {
+  background: #991b1b !important;
 }
 
 /* Hardware Profile Bar */
@@ -457,23 +463,19 @@ footer {
 </header>
 
 <main>
-  <!-- Pure Static Web Transport Panel (Zero Python Required) -->
+  <!-- Direct Hardware Connection Panel -->
   <div class="transport-card">
     <div class="transport-header">
-      <span class="transport-title">Connection Transport</span>
-      <span id="transport-badge" style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--tang-amber);">GitHub Pages Ready · Pure Client-Side</span>
+      <span class="transport-title">Select Connection Link</span>
+      <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--tang-amber);">Direct Browser Hardware Link</span>
     </div>
-    <div class="transport-tabs">
-      <button class="tab-btn active" id="tab-ble" onclick="selectMode('ble')">
-        <span>⚡ Bluetooth (BLE Wireless)</span>
+    <div class="transport-buttons">
+      <button class="btn-conn btn-conn-serial" id="btn-serial" onclick="toggleSerial()">
+        🔌 Connect USB Serial (Cable)
       </button>
-      <button class="tab-btn" id="tab-serial" onclick="selectMode('serial')">
-        <span>🔌 Web Serial (USB Cable)</span>
+      <button class="btn-conn btn-conn-ble" id="btn-ble" onclick="toggleBLE()">
+        ⚡ Connect Bluetooth (BLE Wireless)
       </button>
-
-      <div style="margin-left: auto; display: flex; gap: 8px;">
-        <button class="action-btn" id="btn-connect" onclick="connectActiveMode()">Connect BLE</button>
-      </div>
     </div>
   </div>
 
@@ -485,7 +487,7 @@ footer {
     </div>
     <div class="spec-cell">
       <div class="spec-label">Active Transport</div>
-      <div class="spec-value" id="lbl-active-transport">BLE Wireless</div>
+      <div class="spec-value" id="lbl-active-transport">None</div>
     </div>
     <div class="spec-cell">
       <div class="spec-label">Bus Protocol</div>
@@ -499,8 +501,8 @@ footer {
 
   <!-- Browser & Platform Compatibility Hint -->
   <div class="hint-banner" id="hint-banner">
-    <span id="hint-text">⚡ BLE Mode: Works in Safari iOS (Bluefy / WebBLE app), macOS Chrome/Edge, and Android.</span>
-    <span style="opacity: 0.6;">Zero Drivers Needed</span>
+    <span id="hint-text">💡 Tip: Use Chrome / Edge / Opera for direct USB cable, or Bluefy app on iOS for Bluetooth.</span>
+    <span style="opacity: 0.6;">Zero Python Needed</span>
   </div>
 
   <!-- Hardware Live Key Capture Card -->
@@ -511,7 +513,7 @@ footer {
     </div>
 
     <div id="hardware-arena" class="hardware-arena" tabindex="0">
-      <div class="arena-state">DIRECT STREAM ACTIVE</div>
+      <div class="arena-state">DIRECT STREAM READY</div>
       <div class="arena-headline">Click here and type directly</div>
       <div class="arena-desc">Keystrokes are transmitted instantly with zero buffering to the Next186 FreeDOS engine.</div>
       
@@ -552,14 +554,13 @@ footer {
 
 <script>
 // -------------------------------------------------------------
-// NanoLink86 Multi-Mode Transport Engine
+// NanoLink86 Direct Hardware Engine
 // -------------------------------------------------------------
 const NUS_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const NUS_RX_UUID      = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 const NUS_TX_UUID      = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 
-let currentMode = 'ble'; // 'ble' | 'serial' | 'bridge'
-let isConnected = false;
+let activeLink = null; // 'serial' | 'ble' | null
 
 // Bluetooth Handles
 let bleDevice = null;
@@ -571,6 +572,7 @@ let bleTxChar = null;
 let serialPort = null;
 let serialWriter = null;
 let serialReader = null;
+let serialReadActive = false;
 
 // DOM Elements
 const arena = document.getElementById('hardware-arena');
@@ -580,8 +582,8 @@ const lblStatus = document.getElementById('lbl-status');
 const statusDot = document.getElementById('status-dot');
 const lblActiveTransport = document.getElementById('lbl-active-transport');
 const lblPins = document.getElementById('lbl-pins');
-const btnConnect = document.getElementById('btn-connect');
-const hintText = document.getElementById('hint-text');
+const btnSerial = document.getElementById('btn-serial');
+const btnBle = document.getElementById('btn-ble');
 
 function logTelemetry(msg) {
   const time = new Date().toTimeString().split(' ')[0];
@@ -596,75 +598,148 @@ function clearLogs() {
   telemetryBox.innerHTML = '';
 }
 
-function updateConnectionUI(connected, label) {
-  isConnected = connected;
-  if (connected) {
+function updateUI() {
+  if (activeLink === 'serial') {
     statusDot.classList.add('online');
-    lblStatus.innerText = label || 'ONLINE';
-    btnConnect.innerText = 'Disconnect';
-    btnConnect.classList.add('disconnect');
+    lblStatus.innerText = 'USB SERIAL';
+    lblActiveTransport.innerText = 'Web Serial (115200 baud)';
+    btnSerial.innerText = '🔌 Disconnect USB Serial';
+    btnSerial.classList.add('disconnect');
+    btnSerial.disabled = false;
+    btnBle.disabled = true;
+  } else if (activeLink === 'ble') {
+    statusDot.classList.add('online');
+    lblStatus.innerText = 'BLE WIRELESS';
+    lblActiveTransport.innerText = 'Bluetooth LE (NUS)';
+    btnBle.innerText = '⚡ Disconnect Bluetooth';
+    btnBle.classList.add('disconnect');
+    btnBle.disabled = false;
+    btnSerial.disabled = true;
   } else {
     statusDot.classList.remove('online');
     lblStatus.innerText = 'DISCONNECTED';
-    btnConnect.classList.remove('disconnect');
-    btnConnect.innerText = (currentMode === 'ble') ? 'Connect BLE' : 'Connect Serial';
+    lblActiveTransport.innerText = 'None';
+    btnSerial.innerText = '🔌 Connect USB Serial (Cable)';
+    btnSerial.classList.remove('disconnect');
+    btnSerial.disabled = false;
+    btnBle.innerText = '⚡ Connect Bluetooth (BLE Wireless)';
+    btnBle.classList.remove('disconnect');
+    btnBle.disabled = false;
   }
 }
 
-// Mode Selection
-function selectMode(mode) {
-  currentMode = mode;
-  document.getElementById('tab-ble').classList.toggle('active', mode === 'ble');
-  document.getElementById('tab-serial').classList.toggle('active', mode === 'serial');
-
-  if (mode === 'ble') {
-    lblActiveTransport.innerText = 'BLE Wireless (NUS)';
-    btnConnect.innerText = isConnected ? 'Disconnect' : 'Connect BLE';
-    hintText.innerText = '⚡ BLE Mode: Works in Safari iOS (Bluefy / WebBLE app), macOS Chrome/Edge, and Android.';
-  } else {
-    lblActiveTransport.innerText = 'Web Serial (USB CP2102)';
-    btnConnect.innerText = isConnected ? 'Disconnect' : 'Connect Serial';
-    hintText.innerText = '🔌 Web Serial: Direct USB via Chrome, Edge, Opera. Zero Python server required!';
+// -------------------------------------------------------------
+// 1. Web Serial Implementation
+// -------------------------------------------------------------
+async function toggleSerial() {
+  if (activeLink === 'serial') {
+    await disconnectSerial();
+    return;
   }
+  await connectSerial();
 }
 
-async function connectActiveMode() {
-  if (isConnected) {
-    disconnectActiveMode();
+async function connectSerial() {
+  if (!navigator.serial) {
+    alert('Web Serial API is not supported in this browser.\n\nPlease open this page in Google Chrome, Microsoft Edge, or Opera.');
+    logTelemetry('❌ Browser does not support Web Serial API (Chrome/Edge required).');
     return;
   }
 
-  if (currentMode === 'ble') {
-    await connectBLE();
-  } else {
-    await connectSerial();
+  try {
+    logTelemetry('Opening USB Port Picker...');
+    serialPort = await navigator.serial.requestPort();
+    logTelemetry('Opening port at 115200 baud...');
+    await serialPort.open({ baudRate: 115200 });
+
+    serialWriter = serialPort.writable.getWriter();
+    activeLink = 'serial';
+    updateUI();
+    logTelemetry('✅ Web Serial connected directly to ESP32 CP2102!');
+
+    startSerialReader();
+    await sendTransportCommand('STATUS');
+    arena.focus();
+  } catch (err) {
+    logTelemetry(`❌ Serial Connection Failed: ${err.message || err}`);
+    await disconnectSerial();
   }
 }
 
-function disconnectActiveMode() {
-  if (currentMode === 'ble' && bleDevice && bleDevice.gatt.connected) {
-    bleDevice.gatt.disconnect();
-    logTelemetry('BLE Disconnected by user');
-  } else if (currentMode === 'serial' && serialPort) {
-    try {
-      if (serialWriter) serialWriter.releaseLock();
-      if (serialReader) serialReader.cancel();
-      serialPort.close();
-    } catch(e) {}
+async function startSerialReader() {
+  serialReadActive = true;
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (serialPort && serialPort.readable && serialReadActive) {
+      serialReader = serialPort.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await serialReader.read();
+          if (done) break;
+          if (value) {
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\r\n');
+            buffer = lines.pop();
+            for (const l of lines) {
+              if (l.trim()) {
+                logTelemetry(`📥 SERIAL: ${l.trim()}`);
+                parseStatusLine(l);
+              }
+            }
+          }
+        }
+      } catch (readErr) {
+        break;
+      } finally {
+        if (serialReader) {
+          try { serialReader.releaseLock(); } catch(e) {}
+          serialReader = null;
+        }
+      }
+    }
+  } catch (err) {
+    // reader closed
+  }
+}
+
+async function disconnectSerial() {
+  serialReadActive = false;
+  if (serialReader) {
+    try { await serialReader.cancel(); } catch(e) {}
+    try { serialReader.releaseLock(); } catch(e) {}
+    serialReader = null;
+  }
+  if (serialWriter) {
+    try { serialWriter.releaseLock(); } catch(e) {}
+    serialWriter = null;
+  }
+  if (serialPort) {
+    try { await serialPort.close(); } catch(e) {}
     serialPort = null;
-    logTelemetry('Web Serial Disconnected by user');
-    updateConnectionUI(false);
   }
+  activeLink = null;
+  updateUI();
+  logTelemetry('USB Serial Disconnected.');
 }
 
 // -------------------------------------------------------------
-// 1. Web Bluetooth Implementation
+// 2. Bluetooth (BLE) Implementation
 // -------------------------------------------------------------
+async function toggleBLE() {
+  if (activeLink === 'ble') {
+    disconnectBLE();
+    return;
+  }
+  await connectBLE();
+}
+
 async function connectBLE() {
   if (!navigator.bluetooth) {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const msg = isSafari
-      ? '❌ Safari does not support Web Bluetooth (blocked by Apple).\n\n👉 On Mac: Open this page in Google Chrome or Microsoft Edge.\n👉 On iPhone/iPad: Open this page in the Bluefy app from the App Store.'
+      ? '❌ Safari does not support Web Bluetooth (blocked by Apple).\n\n👉 On Mac: Please open this page in Google Chrome or Microsoft Edge.\n👉 On iPhone/iPad: Please open this page in the Bluefy browser from the App Store.'
       : '❌ Web Bluetooth is not supported or is disabled in your current browser.\nPlease use Google Chrome or Microsoft Edge.';
     alert(msg);
     logTelemetry(msg);
@@ -673,15 +748,13 @@ async function connectBLE() {
 
   try {
     logTelemetry('Opening Bluetooth Device Chooser...');
-    
-    // Request device with primary name filter, fallback to acceptAllDevices
     try {
       bleDevice = await navigator.bluetooth.requestDevice({
         filters: [{ name: 'NanoLink86' }, { namePrefix: 'Nano' }],
         optionalServices: [NUS_SERVICE_UUID]
       });
     } catch (filterErr) {
-      logTelemetry(`Name filter retry: showing all devices (${filterErr.message})`);
+      logTelemetry(`Retrying with all devices: ${filterErr.message}`);
       bleDevice = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: [NUS_SERVICE_UUID]
@@ -689,17 +762,14 @@ async function connectBLE() {
     }
 
     bleDevice.addEventListener('gattserverdisconnected', () => {
-      logTelemetry('⚠️ BLE Connection lost');
-      updateConnectionUI(false);
+      logTelemetry('⚠️ Bluetooth disconnected');
+      disconnectBLE();
     });
 
-    logTelemetry(`Connecting to GATT server (${bleDevice.name})...`);
+    logTelemetry(`Connecting to ${bleDevice.name || 'NanoLink86'}...`);
     bleServer = await bleDevice.gatt.connect();
 
-    logTelemetry('Discovering Nordic UART Service...');
     const service = await bleServer.getPrimaryService(NUS_SERVICE_UUID);
-
-    logTelemetry('Obtaining RX & TX characteristics...');
     bleRxChar = await service.getCharacteristic(NUS_RX_UUID);
     bleTxChar = await service.getCharacteristic(NUS_TX_UUID);
 
@@ -710,72 +780,28 @@ async function connectBLE() {
       parseStatusLine(dec);
     });
 
-    updateConnectionUI(true, 'BLE CONNECTED');
-    logTelemetry('✅ BLE Wireless Link 100% Operational!');
+    activeLink = 'ble';
+    updateUI();
+    logTelemetry('✅ Bluetooth Low Energy Connected!');
     await sendTransportCommand('STATUS');
     arena.focus();
   } catch (err) {
     logTelemetry(`❌ BLE Error: ${err.message || err}`);
-    updateConnectionUI(false);
+    disconnectBLE();
   }
 }
 
-// -------------------------------------------------------------
-// 2. Web Serial Implementation
-// -------------------------------------------------------------
-async function connectSerial() {
-  if (!navigator.serial) {
-    alert('Web Serial API is not supported in this browser.\nPlease use Google Chrome, Microsoft Edge, or Opera.');
-    return;
+function disconnectBLE() {
+  if (bleDevice && bleDevice.gatt && bleDevice.gatt.connected) {
+    bleDevice.gatt.disconnect();
   }
-
-  try {
-    logTelemetry('Requesting USB Serial Port (CP2102)...');
-    serialPort = await navigator.serial.requestPort();
-    await serialPort.open({ baudRate: 115200 });
-
-    const encoder = new TextEncoderStream();
-    encoder.readable.pipeTo(serialPort.writable);
-    serialWriter = encoder.writable.getWriter();
-
-    readSerialLoop();
-
-    updateConnectionUI(true, 'USB SERIAL');
-    logTelemetry('✅ Web Serial connected directly at 115200 baud!');
-    await sendTransportCommand('STATUS');
-    arena.focus();
-  } catch (err) {
-    logTelemetry(`❌ Serial Error: ${err.message || err}`);
-    updateConnectionUI(false);
-  }
-}
-
-async function readSerialLoop() {
-  try {
-    const decoder = new TextDecoderStream();
-    serialPort.readable.pipeTo(decoder.writable);
-    serialReader = decoder.readable.getReader();
-    let buffer = '';
-
-    while (true) {
-      const { value, done } = await serialReader.read();
-      if (done) break;
-      if (value) {
-        buffer += value;
-        const lines = buffer.split('\r\n');
-        buffer = lines.pop();
-        for (const l of lines) {
-          if (l.trim()) {
-            logTelemetry(`📥 SERIAL: ${l.trim()}`);
-            parseStatusLine(l);
-          }
-        }
-      }
-    }
-  } catch (err) {
-    logTelemetry(`Serial read closed: ${err}`);
-    updateConnectionUI(false);
-  }
+  bleDevice = null;
+  bleServer = null;
+  bleRxChar = null;
+  bleTxChar = null;
+  activeLink = null;
+  updateUI();
+  logTelemetry('Bluetooth Disconnected.');
 }
 
 function parseStatusLine(line) {
@@ -793,37 +819,39 @@ function parseStatusLine(line) {
 async function sendTransportCommand(cmd) {
   const payload = cmd + '\r\n';
 
-  if (currentMode === 'ble') {
+  if (activeLink === 'serial') {
+    if (!serialWriter) {
+      logTelemetry('⚠️ USB Serial not ready.');
+      return false;
+    }
+    try {
+      const encoder = new TextEncoder();
+      await serialWriter.write(encoder.encode(payload));
+      return true;
+    } catch (e) {
+      logTelemetry(`❌ Serial send failed: ${e.message}`);
+      return false;
+    }
+  } else if (activeLink === 'ble') {
     if (!bleRxChar) {
-      logTelemetry('⚠️ BLE not connected. Click "Connect BLE" first.');
+      logTelemetry('⚠️ Bluetooth not ready.');
       return false;
     }
     try {
       const encoder = new TextEncoder();
       await bleRxChar.writeValue(encoder.encode(payload));
       return true;
-    } catch(e) {
-      logTelemetry(`❌ BLE Send failed: ${e.message}`);
+    } catch (e) {
+      logTelemetry(`❌ BLE send failed: ${e.message}`);
       return false;
     }
   } else {
-    // Web Serial
-    if (!serialWriter) {
-      logTelemetry('⚠️ Web Serial not connected. Click "Connect Serial" first.');
-      return false;
-    }
-    try {
-      await serialWriter.write(payload);
-      return true;
-    } catch(e) {
-      logTelemetry(`❌ Serial Send failed: ${e.message}`);
-      return false;
-    }
+    logTelemetry('⚠️ Please click "Connect USB Serial" or "Connect Bluetooth" first.');
+    return false;
   }
 }
 
 async function sendRawKey(key) {
-  // Update Key HUD Display
   let label = key.toUpperCase();
   if (key === ' ') label = 'SPACE';
   else if (key === 'Enter') label = 'ENTER';
@@ -848,7 +876,7 @@ async function sendRawKey(key) {
 }
 
 async function sendMacro(macro) {
-  logTelemetry(`🚀 Executing Macro: ${macro}`);
+  logTelemetry(`🚀 Macro: ${macro}`);
   return sendTransportCommand(macro);
 }
 
@@ -862,7 +890,7 @@ async function swapPins() {
 // -------------------------------------------------------------
 window.addEventListener('load', () => {
   arena.focus();
-  logTelemetry('🚀 NanoLink86 Ready. Select "Bluetooth (BLE)" or "Web Serial (USB)" and click Connect.');
+  logTelemetry('🚀 NanoLink86 Ready. Click "Connect USB Serial" or "Connect Bluetooth".');
 });
 
 document.addEventListener('click', (e) => {
