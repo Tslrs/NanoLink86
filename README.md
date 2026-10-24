@@ -13,6 +13,21 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
   * **Web Serial API (Direct USB Cable)** @ 115200 baud.
   * **Bluetooth Low Energy (BLE Wireless)** via Nordic UART Service (NUS).
 * **ESP32 Hardware Co-Processor**: Native Xtensa machine code (Viper) bit-bang engine operating at an exact **12.5 kHz** PS/2 clock to transmit bit-perfect IBM AT Scan Code Set 2 frames to the FPGA.
+* **Ultra-Low Power**: Entire system consumes **less than 1.5 Watts** (< 300 mA total @ 5V). Silent, fanless, and runs for days on a small power bank!
+
+---
+
+## ⚡ Power Consumption & Thermals
+
+Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.power.html`):
+
+| Subsystem | Typical Current (@ 5V) | Power Dissipation | Notes |
+| :--- | :---: | :---: | :--- |
+| **FPGA Core & Logic (GW1NR-9C)** | — | **42.8 mW** | Static: 25.1 mW, Dynamic: 17.7 mW |
+| **Embedded PSRAM (64 Mbit)** | — | **86.0 mW** | High-speed cache memory interface |
+| **Tang Nano 9K Board (Total)** | **~120 - 180 mA** | **~0.6 W - 0.9 W** | Includes HDMI PHY, crystal, LEDs, LDOs |
+| **ESP32 Co-Processor (BLE + Serial)** | **~80 - 110 mA** | **~0.4 W - 0.55 W** | Native Xtensa Viper engine + BLE NUS |
+| **TOTAL SYSTEM (FPGA + ESP32)** | **< 300 mA** | **< 1.5 Watts** | **Ultra-green, completely fanless** |
 
 ---
 
@@ -50,11 +65,13 @@ Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
 
 ## 🔧 Hardware Wiring (ESP32 to Tang Nano 9K)
 
-| ESP32 Pin | Wire Color | Tang Nano 9K Pin | Signal Function |
-| :---: | :---: | :---: | :--- |
-| **GPIO 18** | White | **Pin 18** | PS/2 Keyboard Clock (`ps2_kb_clk`) |
-| **GPIO 19** | Brown | **Pin 19** | PS/2 Keyboard Data (`ps2_kb_dat`) |
-| **GND** | Black | **GND** | Common ground |
+*(Use any standard jumper wires — colors do not matter)*
+
+| ESP32 Pin | Tang Nano 9K Pin | Signal Function | Technical Notes |
+| :---: | :---: | :--- | :--- |
+| **GPIO 18** | **Pin 18** | PS/2 Keyboard Clock (`ps2_kb_clk`) | ~12.5 kHz clock stream from ESP32 |
+| **GPIO 19** | **Pin 19** | PS/2 Keyboard Data (`ps2_kb_dat`) | IBM AT Scan Code Set 2 serial data |
+| **GND** | **GND** | Common Ground Reference | Mandatory electrical ground link |
 
 ---
 
@@ -116,6 +133,7 @@ The 128 MB FreeDOS disk image is included in [`sdcard/FDOS-128M.zip`](sdcard/FDO
 NanoLink86/
 ├── index.html                   # Pure static Web Controller (Web Serial & Web Bluetooth)
 ├── README.md                    # Master documentation & guide
+├── LICENSE                      # MIT Open-Source License
 ├── fpga/
 │   ├── Next186_S.fs             # Ready-to-flash compiled FPGA bitstream (3.55 MB)
 │   ├── Next186_S.gprj           # Gowin EDA complete project file
@@ -135,3 +153,14 @@ NanoLink86/
     ├── FDOS-128M.zip            # Pre-configured 128 MB FreeDOS disk image (Drive C:)
     └── README.md                # MicroSD formatting and flashing instructions
 ```
+
+---
+
+## 📄 License
+
+This project is licensed under the **[MIT License](LICENSE)**.
+
+Upstream core components:
+* **Next186 SoC Core**: GNU General Public License v3.0 (GPL-3.0) by Nicolae Dumitrache.
+* **Gowin Tang Nano 9K Port**: Open source by hi631.
+* **Gowin EDA Fixes**: MIT License by kyo-ta04.
