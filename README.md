@@ -39,7 +39,7 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
    * Ported to Gowin FPGA by **hi631** ([tang-nano-9K / DOS](https://github.com/hi631/tang-nano-9K/tree/master/DOS)).
    * Reference article: [Qiita: Using Tang-Nano-9K to run DOS on a single chip](https://qiita.com/hi631/items/8b847f3415743b602766).
 3. **Gowin EDA v1.9.9+ / v1.9.12 Compatibility Fixes**:
-   * Synthesis and IO Bank constraint fixes were adapted based on the findings from **kyo-ta04** ([kyo-ta04/TN9K_cpm68](https://github.com/kyo-ta04/TN9K_cpm68)).
+   * Synthesis and IO Bank constraint fixes were adapted based on the findings from **kyo-ta04** ([kyo-ta04/TN9K_cpm68k](https://github.com/kyo-ta04/TN9K_cpm68k)).
    * Fixed Bank 3 VCCIO constraint lock conflicts (`ERROR CT1136: Bank 3 vccio(1.8) is locked by other constraint`) by setting buttons and bank 3 I/Os to `LVCMOS18`.
 4. **NanoLink86 Modifications**:
    * Replaced the unstable BL702 onboard debugger keyboard bridge with dedicated native PS/2 routing (`ps2_kb_clk` on Pin 18/25, `ps2_kb_dat` on Pin 19/26).
