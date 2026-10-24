@@ -1,6 +1,20 @@
-MIT License
+# NanoLink86 Licensing & Component Disclaimers
 
-Copyright (c) 2026 Nick Tsalaris (Tslrs) & NanoLink86 Contributors
+This repository contains multiple components with distinct open-source licenses, unified under strict "AS IS" warranty disclaimers.
+
+---
+
+## 1. NanoLink86 Original Code (MIT License)
+
+The following components:
+* **Web Controller Interface** (`index.html` and related web assets)
+* **ESP32 Firmware** (`esp32/main.py`)
+* **Flashing and Utility Scripts** (`fpga/flash_tangnano9k.sh`)
+* **Documentation & Guides** (`README.md`, `sdcard/README.md`)
+
+Are licensed under the **MIT License**:
+
+Copyright (c) 2026 Nick Tsalaris (Tslrs)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -12,17 +26,38 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+---
+
+## 2. Next186 SoC FPGA Core (GNU General Public License v3.0)
+
+The FPGA hardware description files located in `fpga/src/` and `fpga/BIOS/`, including the 80186-compatible CPU core and SoC logic:
+* **Original Next186 SoC**: Copyright (c) Nicolae Dumitrache (OpenCores).
+* **Gowin Tang Nano 9K Port**: Copyright (c) hi631.
+* **Gowin Compatibility Fixes**: Copyright (c) kyo-ta04.
+
+Are licensed under the **GNU General Public License v3.0 (GPL-3.0)**:
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details:
+https://www.gnu.org/licenses/gpl-3.0.html
 
 ---
 
-### Upstream Open-Source Acknowledgments:
-- **Next186 SoC Core**: Originally created by Nicolae Dumitrache (GPL-3.0 / OpenCores).
-- **Tang Nano 9K DOS Port**: Created by hi631 (https://github.com/hi631/tang-nano-9K).
-- **Gowin EDA Compatibility Fixes**: Discovered and contributed by kyo-ta04 (https://github.com/kyo-ta04/TN9K_cpm68).
+## 3. STRICT DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+
+THE SOFTWARE, BITSTREAMS, SCHEMATICS, FIRMWARE, SCRIPTS, AND DOCUMENTATION IN THIS REPOSITORY ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO:
+
+1. THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+2. ANY GUARANTEE THAT THE BITSTREAM OR FIRMWARE WILL OPERATE ERROR-FREE OR WITHOUT INTERRUPTION.
+3. ANY WARRANTY OF NON-INFRINGEMENT OF THIRD-PARTY RIGHTS.
+
+IN NO EVENT SHALL NICK TSALARIS (TSLRS), THE PROJECT CONTRIBUTORS, OR THE UPSTREAM AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, HARDWARE DAMAGE TO FPGA BOARDS, ESP32 MODULES, MONITORS, OR COMPUTERS, LOSS OF DATA ON SD CARDS, LOSS OF PROFITS, BUSINESS INTERRUPTION, OR ELECTRICAL HAZARDS) ARISING IN ANY WAY OUT OF THE USE, FLASHING, MODIFICATION, OR DISTRIBUTION OF THIS SOFTWARE OR HARDWARE DESIGNS, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+YOU FLASH, WIRE, AND OPERATE THIS HARDWARE ENTIRELY AT YOUR OWN RISK.

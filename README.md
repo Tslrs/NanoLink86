@@ -156,11 +156,20 @@ NanoLink86/
 
 ---
 
-## 📄 License
+## 📄 License & Warranty Disclaimer
 
-This project is licensed under the **[MIT License](LICENSE)**.
+This project uses a clear **Component-Based License Structure**:
 
-Upstream core components:
-* **Next186 SoC Core**: GNU General Public License v3.0 (GPL-3.0) by Nicolae Dumitrache.
-* **Gowin Tang Nano 9K Port**: Open source by hi631.
-* **Gowin EDA Fixes**: MIT License by kyo-ta04.
+1. **NanoLink86 Original Code (Web Controller, ESP32 Firmware & Scripts)**:
+   * Licensed under the **[MIT License](LICENSE)** © 2026 Nick Tsalaris (Tslrs).
+   * Free for any personal, educational, or commercial use.
+
+2. **Next186 SoC Core & FPGA RTL (`fpga/src/`, `fpga/BIOS/`)**:
+   * Licensed under the **GNU General Public License v3.0 (GPL-3.0)** by Nicolae Dumitrache & hi631.
+   * Preserves full open-source freedom for the FPGA core.
+
+### ⚠️ Strict "AS IS" Disclaimer (No Warranty)
+> **DISCLAIMER:**  
+> All software, bitstreams, schematics, and firmware in this repository are provided strictly on an **"AS IS"** basis, **WITHOUT WARRANTY OF ANY KIND**.  
+> In no event shall the author (Nick Tsalaris) or contributors be held liable for any damages, hardware failure (FPGA, ESP32, monitors), electrical shorts, or data loss arising from the use or flashing of this project.  
+> **You wire, flash, and operate all hardware entirely at your own risk.** See the full [LICENSE](LICENSE) for complete terms.
