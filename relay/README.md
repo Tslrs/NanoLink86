@@ -1,52 +1,52 @@
-# NanoLink86 • Remote Keyboard Relay & WiFi Setup
+# NanoLink86 • Remote Keyboard Relay & Wi-Fi Setup
 
-Αυτόνομο σύστημα απομακρυσμένου ελέγχου (Remote Control) του FreeDOS (FPGA) μέσω **WiFi και Safari**, είτε σε κεντρικό server είτε τοπικά στο Mac mini.
+An autonomous remote control and telemetry system for FreeDOS running on the Tang Nano 9K FPGA via **Wi-Fi and Safari WebSockets**, deployed on a server or locally on a Mac.
 
 > [!NOTE]
-> Ο κώδικας αυτός είναι **πλήρως ανεξάρτητος** από το βασικό firmware του ESP32 (USB Serial + BLE) και δεν επηρεάζει καθόλου τα υπάρχοντα αρχεία.
+> This relay system operates independently of the primary ESP32 BLE/USB serial firmware and does not overwrite existing configurations.
 
 ---
 
-## 📁 Περιεχόμενα Φακέλου:
+## 📁 Module Overview
 
 1. **`server.py` (Telemetry & Relay Server):**
-   * Γραμμένο σε **Pure Python 3 Standard Library** (δεν χρειάζεται `pip install`, τρέχει παντού).
-   * Σερβίρει το web interface ειδικά σχεδιασμένο για **Safari** (iOS & macOS).
-   * Διαθέτει οθόνη **Login με κωδικό πρόσβασης** (`Master PIN = 1986`).
-   * Ανοίγει 2 θύρες:
-     * Port `8088`: Για το Safari (Web & WebSockets).
-     * Port `8089`: Για την απευθείας σύνδεση του ESP32 μέσω WiFi (TCP Socket & UDP Auto-Discovery).
+   * Written in **Pure Python 3 Standard Library** (zero external dependencies, runs anywhere without `pip`).
+   * Serves an Apple iOS 18 Glassmorphism web console tailored for Safari (iOS & macOS).
+   * Includes a **Passcode Authentication Gateway** (`Default PIN = 1986`, recovery `uowm1986`).
+   * Opens 2 dedicated network ports:
+     * **Port 8088**: HTTP & WebSocket interface for web clients.
+     * **Port 8089**: Direct TCP socket & UDP Auto-Discovery beacon listener for the ESP32.
 
-2. **`history.php` (PHP Dashboard Ιστορικού & Audit Log):**
-   * Πλήρες Web Dashboard σε **PHP** με Apple Glassmorphism αισθητική.
-   * Καταγράφει **ακριβές timestamp**, **συσκευή προέλευσης** (📱 iPhone, 💻 Mac, 🤖 Android, 🐧 Linux, 🪟 Windows), **IP διεύθυνση** και **όλες τις εντολές DOS** που εκτελέστηκαν.
-   * Περιλαμβάνει φίλτρα ανά συσκευή, εξαγωγή σε **CSV** και **JSON**, καθώς και ζωντανό auto-refresh.
-   * Τρέχει στο Port `8080`.
+2. **`history.php` (PHP Telemetry & Audit Dashboard):**
+   * Apple Glassmorphism web dashboard in PHP.
+   * Logs precise timestamps, client devices (Apple iPhone, Mac, Android, Linux, Windows), IP addresses, and executed FreeDOS commands.
+   * Offers real-time client filtering, live auto-refresh, and one-click data export in **CSV** and **JSON** formats.
+   * Runs on **Port 8080**.
 
-3. **`esp32_wifi.py` (Αυτόνομο Firmware για το ESP32):**
-   * Συνδέεται στο WiFi με έξυπνο Captive Portal (AP `NanoLink86-Setup`) και UDP Auto-Discovery.
-   * Περιλαμβάνει την εγγενή μηχανή **Xtensa Viper** (`ps2_transmit_byte`) στα GPIO Pins 18 (CLK) & 19 (DAT).
-   * Υποστηρίζει real-time typing χαρακτήρα-προς-χαρακτήρα και hardware reset `Ctrl+Alt+Del`.
+3. **`esp32_wifi.py` (Standalone Firmware for ESP32):**
+   * High-speed Wi-Fi co-processor firmware featuring a Smart Captive Portal (`NanoLink86-Setup`) and Zero-Config UDP Auto-Discovery.
+   * Features native **Xtensa Viper** machine-code engine (`ps2_transmit_byte`) driving PS/2 clock and data pins at an exact **12.5 kHz**.
+   * Supports instantaneous keystroke injection, hardware reset (`Ctrl+Alt+Del`), and physical factory reset via BOOT button (GPIO 0).
 
 ---
 
-## 🚀 Βήμα 1: Εκτέλεση Server στο Mac mini
+## 🚀 Quick Start Guide
 
-1. Άνοιξε το Terminal και τρέξε:
-   ```bash
-   python3 server.py
-   ```
-2. Άνοιξε το **Safari** και μπες στο:
+### Step 1: Start the Relay Server
+Run the standalone relay server on your host machine:
+```bash
+python3 server.py
+```
+
+### Step 2: Access the Web Console
+1. Open **Safari** (or any modern web browser) at:
    ```text
    http://localhost:8088
    ```
-3. Βάλε τον κωδικό: **`1986`** (ή το recovery **`uowm1986`**) και πάτα **Enter**.
-4. Θα δεις την κονσόλα με τα πλήκτρα του FreeDOS έτοιμη!
+2. Enter the 4-digit passcode: **`1986`** (or recovery **`uowm1986`**) and press **Enter**.
+3. The responsive retro gaming and DOS keyboard console will load immediately.
 
----
-
-## 📡 Βήμα 2: Ρύθμιση του ESP32 (`esp32_wifi.py`)
-
-1. Άνοιξε το hotspot `NanoLink86-Setup` από το κινητό ή το Mac.
-2. Επίλεξε το WiFi σου και πάτα **Connect**.
-3. Μόλις συνδεθεί, στο Safari η ένδειξη **ESP32** θα γίνει πράσινη (**Online**) και είσαι έτοιμος!
+### Step 3: Configure the ESP32 Co-Processor
+1. Connect to the Wi-Fi hotspot named **`NanoLink86-Setup`** from your phone or laptop.
+2. Select your local Wi-Fi network and enter its credentials.
+3. Once connected, the ESP32 indicator on the web console turns green (**Online**) with zero manual IP entry required.
