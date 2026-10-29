@@ -9,11 +9,12 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
 * **Next186 SoC on GW1NR-9C**: Full 80186-compatible CPU core, 8042 keyboard controller, VGA-to-HDMI DVI TX (640x480 @ 60 Hz), hardware SPI MicroSD disk controller.
 * **Complete FPGA Sources**: Includes the full Gowin project (`Next186_S.gprj`), all Verilog RTL sources (`fpga/src/`), ROM BIOS assembly (`fpga/BIOS/`), and bootstrap code (`fpga/BOOT/`).
 * **Master Drive `C:` FreeDOS**: Automatically boots FreeDOS from the onboard TF card slot into a fully functional DOS shell.
-* **Dual-Mode Web Controller**: Zero-install static web controller supporting:
-  * **Web Serial API (Direct USB Cable)** @ 115200 baud.
-  * **Bluetooth Low Energy (BLE Wireless)** via Nordic UART Service (NUS).
+* **Multi-Mode Hardware Controllers**: Supports 3 distinct operating modes tailored for any environment:
+  * **Web Serial API (Direct USB Cable)** @ 115200 baud for instant zero-latency bench debugging.
+  * **Bluetooth Low Energy (BLE Wireless)** via Nordic UART Service (NUS) with zero network dependency.
+  * **Wi-Fi Telemetry & WebSocket Relay** with Apple iOS 18 Glassmorphism console, smart captive portal (`NanoLink86-Setup`), UDP auto-discovery, and PHP audit tracking (`history.php`).
 * **ESP32 Hardware Co-Processor**: Native Xtensa machine code (Viper) bit-bang engine operating at an exact **12.5 kHz** PS/2 clock to transmit bit-perfect IBM AT Scan Code Set 2 frames to the FPGA.
-* **Ultra-Low Power**: Entire system consumes **less than 1.5 Watts** (< 300 mA total @ 5V). Silent, fanless, and runs for days on a small power bank!
+* **Ultra-Low Power**: Tang Nano 9K board consumes **under 1 Watt** (~120 - 180 mA @ 5V). Silent, fanless, and runs for days on a small power bank!
 
 ---
 
@@ -26,8 +27,7 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
 | **FPGA Core & Logic (GW1NR-9C)** | — | **42.8 mW** | Static: 25.1 mW, Dynamic: 17.7 mW |
 | **Embedded PSRAM (64 Mbit)** | — | **86.0 mW** | High-speed cache memory interface |
 | **Tang Nano 9K Board (Total)** | **~120 - 180 mA** | **~0.6 W - 0.9 W** | Includes HDMI PHY, crystal, LEDs, LDOs |
-| **ESP32 Co-Processor (BLE + Serial)** | **~80 - 110 mA** | **~0.4 W - 0.55 W** | Native Xtensa Viper engine + BLE NUS |
-| **TOTAL SYSTEM (FPGA + ESP32)** | **< 300 mA** | **< 1.5 Watts** | **Ultra-green, completely fanless** |
+| **TOTAL FPGA SoC** | **~120 - 180 mA** | **< 1.0 Watt** | **Ultra-green, completely fanless** |
 
 ---
 
@@ -133,10 +133,26 @@ The 128 MB FreeDOS disk image is included in [`sdcard/FDOS-128M.zip`](sdcard/FDO
 
 ---
 
-### Step 4: Open the Web Controller
+### Step 4: Open the Web Controller (USB Serial & BLE)
 * Open **`https://tslrs.github.io/NanoLink86/`** (or open local `index.html`) in **Google Chrome**, **Microsoft Edge**, or the **Bluefy** iOS app.
 * Click **`🔌 Connect USB Serial`** (for direct USB cable) or **`⚡ Connect Bluetooth`** (for wireless control).
 * Type directly inside the console arena — keystrokes stream with zero buffering into FreeDOS!
+
+---
+
+### Step 5: (Optional) Launch the Wi-Fi Telemetry & Safari Relay
+For local network or remote access over Wi-Fi:
+1. Flash the ESP32 with the Wi-Fi firmware:
+   ```bash
+   python3 esp32/flash_esp32.py
+   ```
+2. Start the relay server on your host machine (Apple macOS native runner):
+   ```bash
+   cd relay
+   ./start_mac.sh
+   ```
+3. Open **Safari** or mobile browser at **`http://<server-ip>:8088`** (PIN: `1986`).
+4. Monitor live device logins and command audits at **`http://<server-ip>:8080/history.php`**.
 
 ---
 
