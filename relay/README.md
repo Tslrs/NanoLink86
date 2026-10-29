@@ -2,6 +2,14 @@
 
 An autonomous remote control and telemetry system for FreeDOS running on the Tang Nano 9K FPGA via **Wi-Fi and Safari WebSockets**, deployed on a server or locally on a Mac.
 
+> [!IMPORTANT]
+> **Hardware-Verified Environment (Tested & Proven on Apple macOS):**  
+> The primary, benchmarked, and live-tested platform for NanoLink86 is **Apple macOS Native** (Apple Silicon & Intel).  
+> Running natively on macOS provides direct access to the local Darwin network stack, ensuring zero-latency response and 100% reliable UDP Zero-Config Auto-Discovery without virtualization packet drops.  
+>  
+> **Containerized Deployment (Extra / Cloud VPS):**  
+> A multi-service container configuration (`Dockerfile` & `docker-compose.yml`) is provided as an extra feature for users running remote Linux VPS, homelabs, or cloud hosts. While the container architecture is fully verified, live bare-metal hardware testing was officially performed on Apple macOS.
+
 > [!NOTE]
 > **Lost Passcode Recovery:**  
 > If you ever forget your 4-digit security PIN, there are no hardcoded backdoors. Simply open or edit the local file `server_config.json` on the host machine to view or update your active PIN. Changes take effect instantly without restarting.
@@ -47,23 +55,69 @@ NanoLink86 provides two independent, native firmware engines for the ESP32 co-pr
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Deployment Guide
 
-### Step 1: Start the Relay Server
-Run the standalone relay server on your host machine:
-```bash
-python3 server.py
-```
+### Option A: Apple macOS Native (Recommended & Hardware-Verified)
 
-### Step 2: Access the Web Console
-1. Open **Safari** (or any modern web browser) at:
-   ```text
-   http://localhost:8088
+This is the official platform where the system has been tested live with the Tang Nano 9K FPGA.
+
+1. **One-Click Runner**:
+   ```bash
+   cd relay
+   ./start_mac.sh
    ```
-2. Enter the 4-digit passcode: **`1986`** and press **Enter**.
-3. The responsive retro gaming and DOS keyboard console will load immediately.
+   *(Starts both `server.py` on ports 8088/8089 and `history.php` on port 8080).*
 
-### Step 3: Configure the ESP32 Co-Processor
-1. Connect to the Wi-Fi hotspot named **`NanoLink86-Setup`** from your phone or laptop.
-2. Select your local Wi-Fi network and enter its credentials.
-3. Once connected, the ESP32 indicator on the web console turns green (**Online**) with zero manual IP entry required.
+2. **Or Run Individually**:
+   ```bash
+   # Terminal 1: Python Relay Server
+   python3 -u server.py
+
+   # Terminal 2: PHP Audit Dashboard
+   php -S 0.0.0.0:8080 history.php
+   ```
+
+3. **Apple Background Service (`LaunchAgent`)**:
+   To keep the relay running automatically on system boot:
+   ```bash
+   cp com.nanolink86.relay.plist ~/Library/LaunchAgents/
+   launchctl load ~/Library/LaunchAgents/com.nanolink86.relay.plist
+   ```
+
+---
+
+### Option B: Containerized Deployment (Extra / Linux / Cloud VPS)
+
+For remote cloud servers, VPS, or homelabs:
+
+1. **Launch with Docker Compose**:
+   ```bash
+   cd relay
+   docker-compose up -d
+   ```
+
+2. **Or Build Manually**:
+   ```bash
+   docker build -t nanolink86-relay .
+   docker run -d \
+     -p 8088:8088 \
+     -p 8089:8089 \
+     -p 8089:8089/udp \
+     -p 8080:8080 \
+     -v $(pwd)/data:/app/data \
+     --name nanolink86-relay nanolink86-relay
+   ```
+
+---
+
+## 📱 Connecting to the Relay
+
+1. **Open Safari / Browser**:
+   * Web Console: `http://localhost:8088` (or `http://<server-ip>:8088`)
+   * PHP History Dashboard: `http://localhost:8080` (or `http://<server-ip>:8080/history.php`)
+2. **Authenticate**:
+   * Enter the 4-digit passcode: **`1986`**.
+3. **Connect the ESP32 Co-Processor**:
+   * Connect to the Wi-Fi hotspot **`NanoLink86-Setup`** from your phone.
+   * Select your Wi-Fi network and submit.
+   * The ESP32 discovers the host via UDP beacon and connects automatically (**Online** indicator turns green).

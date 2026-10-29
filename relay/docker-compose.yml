@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  nanolink86-relay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nanolink86-relay
+    restart: unless-stopped
+    ports:
+      - "8088:8088"        # Safari & Web Console (TCP)
+      - "8089:8089"        # ESP32 Direct Socket (TCP)
+      - "8089:8089/udp"    # ESP32 Zero-Config Discovery Beacon (UDP)
+      - "8080:8080"        # PHP History & Audit Dashboard (TCP)
+    volumes:
+      - ./data:/app/data   # Persistent audit logs and server config
+    environment:
+      - TZ=Europe/Athens
+      - DATA_DIR=/app/data
+      - PYTHONUNBUFFERED=1

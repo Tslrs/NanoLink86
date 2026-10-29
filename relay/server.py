@@ -27,9 +27,10 @@ HTTP_PORT = 8088          # Port for Safari Web Browser & WebSocket
 ESP32_PORT = 8089         # Dedicated Port for ESP32 WiFi Socket (TCP & UDP)
 AUTH_PIN = "1986"         # Apple-Style 4-Digit Security Passcode
 
-STATS_FILE = os.path.join(os.path.dirname(__file__), "server_stats.json")
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), "server_config.json")
-AUDIT_LOG_FILE = os.path.join(os.path.dirname(__file__), "audit_log.json")
+DATA_DIR = os.environ.get("DATA_DIR", os.path.dirname(__file__))
+STATS_FILE = os.path.join(DATA_DIR, "server_stats.json")
+CONFIG_FILE = os.path.join(DATA_DIR, "server_config.json")
+AUDIT_LOG_FILE = os.path.join(DATA_DIR, "audit_log.json")
 SERVER_START_TIME = time.time()
 
 def load_server_config():

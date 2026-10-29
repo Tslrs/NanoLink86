@@ -9,7 +9,8 @@
 date_default_timezone_set('Europe/Athens');
 error_reporting(E_ALL & ~E_DEPRECATED);
 
-$log_file = __DIR__ . '/audit_log.json';
+$data_dir = getenv('DATA_DIR') ? getenv('DATA_DIR') : __DIR__;
+$log_file = $data_dir . '/audit_log.json';
 
 // Initialize log structure if file doesn't exist
 if (!file_exists($log_file)) {

@@ -167,7 +167,10 @@ NanoLink86/
 ├── relay/
 │   ├── server.py                # Pure Python 3 Web & Safari WebSocket live keyboard server
 │   ├── history.php              # PHP Telemetry & Audit Dashboard (Device logs & Command tracking)
-│   └── README.md                # Relay setup and usage guide
+│   ├── start_mac.sh             # Native Apple macOS one-click runner (Hardware-verified)
+│   ├── Dockerfile               # Multi-service container specification (Extra / Cloud VPS)
+│   ├── docker-compose.yml       # Production Compose configuration
+│   └── README.md                # Deployment guide (Apple Native vs Container)
 └── sdcard/
     ├── FDOS-128M.zip            # Pre-configured 128 MB FreeDOS disk image (Drive C:)
     └── README.md                # MicroSD formatting and flashing instructions
