@@ -4,11 +4,12 @@
 <dict>
     <key>Label</key>
     <string>com.nanolink86.relay</string>
+    <key>WorkingDirectory</key>
+    <string>/Users/nt/Documents/NANO/web_dos/relay</string>
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>-c</string>
-        <string>cd "$(dirname "$0")" &amp;&amp; ./start_mac.sh</string>
+        <string>/Users/nt/Documents/NANO/web_dos/relay/start_mac.sh</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

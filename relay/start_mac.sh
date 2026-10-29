@@ -8,6 +8,8 @@
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 echo "=========================================================="
 echo "  NanoLink86 • Native Apple macOS Runner                  "
 echo "  Web & Safari Interface Port : http://localhost:8088    "
