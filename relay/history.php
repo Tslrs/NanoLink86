@@ -672,7 +672,7 @@ if ($filter_device !== 'all') {
   </div>
 
   <div class="footer">
-    NanoLink86 Project • University of Western Macedonia (UoWM) • Remote PS/2 Co-Processor<br>
+    NanoLink86 Project • Tang Nano 9K FPGA & ESP32 PS/2 Co-Processor<br>
     Auto-refreshing every 5 seconds &bull; <a href="http://localhost:8088" target="_blank">Open Remote Console ➔</a>
   </div>
 </div>

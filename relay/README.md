@@ -3,7 +3,24 @@
 An autonomous remote control and telemetry system for FreeDOS running on the Tang Nano 9K FPGA via **Wi-Fi and Safari WebSockets**, deployed on a server or locally on a Mac.
 
 > [!NOTE]
-> This relay system operates independently of the primary ESP32 BLE/USB serial firmware and does not overwrite existing configurations.
+> **Lost Passcode Recovery:**  
+> If you ever forget your 4-digit security PIN, there are no hardcoded backdoors. Simply open or edit the local file `server_config.json` on the host machine to view or update your active PIN. Changes take effect instantly without restarting.
+
+---
+
+## ⚡ BLE vs. Wi-Fi Firmware: Which One to Use?
+
+NanoLink86 provides two independent, native firmware engines for the ESP32 co-processor:
+
+| Feature | ⚡ BLE Wireless Mode (`esp32/main.py`) | 📶 Wi-Fi & Relay Mode (`esp32/esp32_wifi.py`) |
+| :--- | :--- | :--- |
+| **Network Dependency** | **Zero Network Needed** (Direct peer-to-peer) | Requires local Wi-Fi or Access Point |
+| **Interface** | Static Web Bluetooth (`index.html`) | Full-duplex WebSockets & Safari (`server.py`) |
+| **Setup** | Zero-Install (GitHub Pages or local file) | Smart Captive Portal (`NanoLink86-Setup`) |
+| **Multi-Device** | Single paired Bluetooth device | Unlimited simultaneous web clients |
+| **Command Auditing** | None | Full audit log & device tracking (`history.php`) |
+| **Hotspot Auto-Discovery** | Standard BLE advertisement | Zero-Config UDP multicast / broadcast |
+| **Use Case** | Quick bench debugging, portable setups | Remote labs, presentation demos, mobile control |
 
 ---
 
@@ -12,7 +29,7 @@ An autonomous remote control and telemetry system for FreeDOS running on the Tan
 1. **`server.py` (Telemetry & Relay Server):**
    * Written in **Pure Python 3 Standard Library** (zero external dependencies, runs anywhere without `pip`).
    * Serves an Apple iOS 18 Glassmorphism web console tailored for Safari (iOS & macOS).
-   * Includes a **Passcode Authentication Gateway** (`Default PIN = 1986`, recovery `uowm1986`).
+   * Includes a **Passcode Authentication Gateway** (`Default PIN = 1986`, customizable from the Settings UI).
    * Opens 2 dedicated network ports:
      * **Port 8088**: HTTP & WebSocket interface for web clients.
      * **Port 8089**: Direct TCP socket & UDP Auto-Discovery beacon listener for the ESP32.
@@ -43,7 +60,7 @@ python3 server.py
    ```text
    http://localhost:8088
    ```
-2. Enter the 4-digit passcode: **`1986`** (or recovery **`uowm1986`**) and press **Enter**.
+2. Enter the 4-digit passcode: **`1986`** and press **Enter**.
 3. The responsive retro gaming and DOS keyboard console will load immediately.
 
 ### Step 3: Configure the ESP32 Co-Processor

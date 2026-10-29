@@ -1533,8 +1533,8 @@ async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.Stream
 
     device_name = parse_device_info(user_agent)
 
-    # Validate Master PIN (1986 or uowm1986)
-    if token not in [AUTH_PIN, "uowm1986"]:
+    # Validate Master PIN
+    if token != AUTH_PIN:
         record_audit_event("login", {
             "device": device_name,
             "ip": client_ip,
@@ -1757,7 +1757,7 @@ async def handle_esp32_client(reader: asyncio.StreamReader, writer: asyncio.Stre
     try:
         line = await reader.readline()
         handshake = line.decode('utf-8', 'ignore').strip()
-        if handshake not in [f"AUTH:{AUTH_PIN}", "AUTH:uowm1986"]:
+        if handshake != f"AUTH:{AUTH_PIN}":
             print(f"[ESP32] REJECTED: Invalid Token '{handshake}' from {addr}")
             writer.write(b"ERR:INVALID_AUTH\n")
             await writer.drain()
