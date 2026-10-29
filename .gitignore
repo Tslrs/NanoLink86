@@ -1,4 +1,27 @@
+# ======================================================================
+# NanoLink86 .gitignore
+# ======================================================================
+
+# Presentation & Keynote (Keep local, do not upload)
+*.pptx
+*.ppt
+*.key
+
+# Sensitive Runtime Configurations & Logs (No Passwords / No Audit Leak)
+wifi_config.json
+server_config.json
+server_stats.json
+audit_log.json
 *.log
+
+# Python Cache & OS Artifacts
+__pycache__/
+*.py[cod]
 .DS_Store
+Thumbs.db
+
+# Screen capture artifacts
 current_screen.jpg
-server.py
+
+# Root legacy server scratch
+/server.py

@@ -161,7 +161,13 @@ NanoLink86/
 │   ├── BIOS/                    # x86 ROM BIOS assembly source and binaries
 │   └── BOOT/                    # Bootstrap loader source
 ├── esp32/
-│   └── main.py                  # Dual-mode Xtensa Viper PS/2 engine + BLE NUS firmware
+│   ├── main.py                  # Dual-mode Xtensa Viper PS/2 engine + BLE NUS firmware
+│   ├── esp32_wifi.py            # Precision WiFi Viper Client (Captive Portal & Zero-Config Discovery)
+│   └── flash_esp32.py           # 100% reliable chunked Base64 flashing tool
+├── relay/
+│   ├── server.py                # Pure Python 3 Web & Safari WebSocket live keyboard server
+│   ├── history.php              # PHP Telemetry & Audit Dashboard (Device logs & Command tracking)
+│   └── README.md                # Relay setup and usage guide
 └── sdcard/
     ├── FDOS-128M.zip            # Pre-configured 128 MB FreeDOS disk image (Drive C:)
     └── README.md                # MicroSD formatting and flashing instructions
