@@ -22,6 +22,13 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
 
 The complete hardware/software co-design bridges classic 16-bit x86 architecture with modern zero-latency web and wireless control:
 
+<p align="center">
+  <img src="assets/system_architecture.svg" width="100%" alt="NanoLink86 System Architecture: Tang Nano 9K FPGA SoC, ESP32 Viper Engine & Web Controller" />
+</p>
+
+<details>
+<summary><b>🔍 Click to view interactive Mermaid text diagram</b></summary>
+
 ```mermaid
 flowchart LR
     subgraph FPGA ["Tang Nano 9K (Gowin GW1NR-9C)"]
@@ -52,6 +59,8 @@ flowchart LR
     VGA -- "Digital Video Out" --> DISP["HDMI Monitor / TV"]
     SPI -- "FAT16 Raw Sectors" --> SD["MicroSD Card (128MB)"]
 ```
+
+</details>
 
 ---
 
@@ -213,6 +222,7 @@ NanoLink86/
 ├── README.md                    # Master documentation & guide
 ├── LICENSE                      # MIT Open-Source License
 ├── assets/                      # System architecture diagrams & bare-metal execution captures
+│   ├── system_architecture.svg  # High-resolution vector system architecture diagram
 │   ├── demo_bios_boot.png       # Next186 BIOS boot screen capture
 │   └── demo_freedos_exec.png    # FreeDOS 1.3 DIR and VER command execution
 ├── fpga/
