@@ -18,6 +18,55 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
 
 ---
 
+## 🏛️ System Architecture
+
+The complete hardware/software co-design bridges classic 16-bit x86 architecture with modern zero-latency web and wireless control:
+
+```mermaid
+flowchart LR
+    subgraph FPGA ["Tang Nano 9K (Gowin GW1NR-9C)"]
+        CPU["Next186 CPU Core<br/>(80186 @ 18 MHz)"]
+        RAM["64 Mbit PSRAM<br/>Cache Interface"]
+        VGA["DVI TX HDMI<br/>(640x480 @ 60Hz)"]
+        SPI["SPI Master Host<br/>(TF MicroSD Drive C:)"]
+        KBD["Intel 8042 PS/2<br/>Keyboard Controller"]
+        
+        CPU <--> RAM
+        CPU --> VGA
+        CPU <--> SPI
+        KBD --> CPU
+    end
+
+    subgraph ESP ["ESP32 Hardware Co-Processor"]
+        VIPER["Xtensa Viper Engine<br/>(@micropython.viper)"]
+        COMMS["Dual Link Controller<br/>(WebSerial & BLE NUS)"]
+        VIPER <--> COMMS
+    end
+
+    subgraph CLIENT ["Client Interface"]
+        UI["Zero-Install Web Controller<br/>(Chrome / Safari / Bluefy)"]
+    end
+
+    VIPER -- "PS/2 Clock (12.5 kHz)<br/>PS/2 Data (Set 2)" --> KBD
+    UI -- "Web Serial (USB @ 115200)<br/>Web Bluetooth (BLE)" --> COMMS
+    VGA -- "Digital Video Out" --> DISP["HDMI Monitor / TV"]
+    SPI -- "FAT16 Raw Sectors" --> SD["MicroSD Card (128MB)"]
+```
+
+---
+
+## 📺 Live Hardware Demos & Execution
+
+<p align="center">
+  <img src="assets/demo_bios_boot.png" width="49%" alt="Next186 BIOS Boot Screen on Tang Nano 9K" />
+  <img src="assets/demo_freedos_exec.png" width="49%" alt="FreeDOS 1.3 Shell Execution" />
+</p>
+
+* **Left (ROM Initialization)**: Next186 Chameleon SoC PC BIOS initializing on the Tang Nano 9K (80186 @ 18 MHz, 1 MB DDR, 15 GB SD Card, FreeDOS kernel build 2042).
+* **Right (Bare-Metal Shell)**: Functional FreeDOS 1.3 shell executing `VER` and `DIR` commands loaded directly from the MicroSD FAT16 master drive (`C:`).
+
+---
+
 ## ⚡ Power Consumption & Thermals
 
 Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.power.html`):
@@ -163,6 +212,9 @@ NanoLink86/
 ├── index.html                   # Pure static Web Controller (Web Serial & Web Bluetooth)
 ├── README.md                    # Master documentation & guide
 ├── LICENSE                      # MIT Open-Source License
+├── assets/                      # System architecture diagrams & bare-metal execution captures
+│   ├── demo_bios_boot.png       # Next186 BIOS boot screen capture
+│   └── demo_freedos_exec.png    # FreeDOS 1.3 DIR and VER command execution
 ├── fpga/
 │   ├── Next186_S.fs             # Ready-to-flash compiled FPGA bitstream (3.55 MB)
 │   ├── Next186_S.gprj           # Gowin EDA complete project file
