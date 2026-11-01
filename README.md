@@ -195,7 +195,9 @@ openFPGALoader -b tangnano9k -f fpga/Next186_S.fs
 ---
 
 ### Step 2: Prepare the MicroSD Card (Drive `C:`)
-The 128 MB FreeDOS disk image is included in [`sdcard/FDOS-128M.zip`](sdcard/FDOS-128M.zip).
+Ready-to-flash 128 MB disk images are located in the [`sdcard/`](sdcard/) directory:
+* **`sdcard/FDOS-128M-with-games.zip` (⭐ Recommended)**: Pre-configured Golden Image containing FreeDOS 1.3 kernel plus pre-installed benchmark games (`C:\GAMES\TETRIS`, `C:\GAMES\PRINCE`, `C:\GAMES\DIGGER`).
+* **`sdcard/FDOS-128M.zip`**: Clean base FreeDOS 1.3 shell without games.
 
 > [!IMPORTANT]
 > **Use Raspberry Pi Imager!**  
@@ -205,7 +207,8 @@ The 128 MB FreeDOS disk image is included in [`sdcard/FDOS-128M.zip`](sdcard/FDO
 1. Unzip the image:
    ```bash
    cd sdcard
-   unzip FDOS-128M.zip
+   # Extract Golden Image with Games:
+   unzip FDOS-128M-with-games.zip
    ```
 2. Open **Raspberry Pi Imager** → **Choose OS** → **Use custom** → select `FDOS-128M.img`.
 3. Choose your MicroSD card and click **Write**.
@@ -266,40 +269,47 @@ For local network or remote access over Wi-Fi:
 
 ```
 NanoLink86/
-├── index.html                   # Pure static Web Controller (Web Serial & Web Bluetooth)
-├── README.md                    # Master documentation & guide
-├── LICENSE                      # MIT Open-Source License
-├── assets/                      # System architecture diagrams & bare-metal execution captures
-│   ├── system_architecture.svg  # High-resolution vector system architecture diagram
-│   ├── demo_bios_boot.png       # Next186 BIOS boot screen capture
-│   └── demo_freedos_exec.png    # FreeDOS 1.3 DIR and VER command execution
+├── index.html                      # Pure static Web Controller (Web Serial & Web Bluetooth)
+├── README.md                       # Master documentation & guide
+├── LICENSE                         # MIT Open-Source License
+├── assets/                         # Architecture diagrams, animated gameplay demos & hardware analysis
+│   ├── system_architecture.svg     # High-resolution vector system architecture diagram
+│   ├── demo_bios_boot.png          # Next186 BIOS boot screen capture
+│   ├── demo_freedos_exec.png       # FreeDOS 1.3 DIR and VER command execution
+│   ├── tetris_demo.gif             # Live interactive Tetris gameplay & PS/2 interrupt benchmark
+│   ├── prince_of_persia_demo.gif   # Level 1 Dungeon 256-color VGA Mode 13h benchmark
+│   ├── pop_intro_demo.gif          # FreeDOS shell launch & Sultan's Palace palette fade-in
+│   ├── digger_cga_aliasing.png     # Digger 1983 CGA Mode 04h memory aliasing failure analysis
+│   ├── microsd_hardware_matrix.png # Studio MicroSD SPI protocol validation banner
+│   └── card_*.png                  # Individual high-resolution MicroSD card assets
 ├── fpga/
-│   ├── Next186_S.fs             # Ready-to-flash compiled FPGA bitstream (3.55 MB)
-│   ├── Next186_S.gprj           # Gowin EDA complete project file
-│   ├── flash_tangnano9k.sh      # 1-click openFPGALoader flashing script
-│   ├── src/                     # Complete Verilog HDL RTL source tree
-│   │   ├── Next186/             # 80186 CPU core (ALU, BIU, Registers, CPU)
-│   │   ├── hdmi/                # DVI TX HDMI video encoder (640x480 @ 60Hz)
-│   │   ├── KB_8042.v            # IBM 8042 PS/2 keyboard controller
-│   │   ├── mem_controller.v     # SDRAM / PSRAM cache controller
-│   │   ├── vga.v                # VGA core
-│   │   └── Next186_SoC.cst      # Gowin physical pin constraint file
-│   ├── BIOS/                    # x86 ROM BIOS assembly source and binaries
-│   └── BOOT/                    # Bootstrap loader source
+│   ├── Next186_S.fs                # Ready-to-flash compiled FPGA bitstream (3.55 MB)
+│   ├── Next186_S.gprj              # Gowin EDA complete project file
+│   ├── flash_tangnano9k.sh         # 1-click openFPGALoader flashing script
+│   ├── src/                        # Complete Verilog HDL RTL source tree
+│   │   ├── Next186/                # 80186 CPU core (ALU, BIU, Registers, CPU)
+│   │   ├── hdmi/                   # DVI TX HDMI video encoder (640x480 @ 60Hz)
+│   │   ├── KB_8042.v               # IBM 8042 PS/2 keyboard controller
+│   │   ├── mem_controller.v        # SDRAM / PSRAM cache controller
+│   │   ├── vga.v                   # VGA core
+│   │   └── Next186_SoC.cst         # Gowin physical pin constraint file
+│   ├── BIOS/                       # x86 ROM BIOS assembly source and binaries
+│   └── BOOT/                       # Bootstrap loader source
 ├── esp32/
-│   ├── main.py                  # Dual-mode Xtensa Viper PS/2 engine + BLE NUS firmware
-│   ├── esp32_wifi.py            # Precision WiFi Viper Client (Captive Portal & Zero-Config Discovery)
-│   └── flash_esp32.py           # 100% reliable chunked Base64 flashing tool
+│   ├── main.py                     # Dual-mode Xtensa Viper PS/2 engine + BLE NUS firmware
+│   ├── esp32_wifi.py               # Precision WiFi Viper Client (Captive Portal & Zero-Config Discovery)
+│   └── flash_esp32.py              # 100% reliable chunked Base64 flashing tool
 ├── relay/
-│   ├── server.py                # Pure Python 3 Web & Safari WebSocket live keyboard server
-│   ├── history.php              # PHP Telemetry & Audit Dashboard (Device logs & Command tracking)
-│   ├── start_mac.sh             # Native Apple macOS one-click runner (Hardware-verified)
-│   ├── Dockerfile               # Multi-service container specification (Extra / Cloud VPS)
-│   ├── docker-compose.yml       # Production Compose configuration
-│   └── README.md                # Deployment guide (Apple Native vs Container)
+│   ├── server.py                   # Pure Python 3 Web & Safari WebSocket live keyboard server
+│   ├── history.php                 # PHP Telemetry & Audit Dashboard (Device logs & Command tracking)
+│   ├── start_mac.sh                # Native Apple macOS one-click runner (Hardware-verified)
+│   ├── Dockerfile                  # Multi-service container specification (Extra / Cloud VPS)
+│   ├── docker-compose.yml          # Production Compose configuration
+│   └── README.md                   # Deployment guide (Apple Native vs Container)
 └── sdcard/
-    ├── FDOS-128M.zip            # Pre-configured 128 MB FreeDOS disk image (Drive C:)
-    └── README.md                # MicroSD formatting and flashing instructions
+    ├── FDOS-128M-with-games.zip    # ⭐ Golden Production Image: FreeDOS 1.3 + Tetris, PoP, Digger (4.3 MB)
+    ├── FDOS-128M.zip               # Base 128 MB FreeDOS clean shell disk image (4.3 MB)
+    └── README.md                   # MicroSD formatting, SPI timing & flashing instructions
 ```
 
 ---

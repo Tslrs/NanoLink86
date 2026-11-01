@@ -1,6 +1,14 @@
 # FreeDOS MicroSD Card Setup for Tang Nano 9K (Next186 SoC)
 
-This folder contains the **128 MB FreeDOS Disk Image** (`FDOS-128M.zip`) configured specifically for the Next186 SoC on the Sipeed Tang Nano 9K.
+This folder contains ready-to-flash **128 MB FreeDOS Disk Images** configured specifically for the Next186 SoC on the Sipeed Tang Nano 9K:
+
+1. **`FDOS-128M-with-games.zip` (⭐ Recommended — Golden Production Image)**:  
+   * Pre-installed with **FreeDOS 1.3 kernel** + **Full Retro Gaming Benchmark Suite**:
+     * `C:\GAMES\TETRIS` (1986 AcademySoft Tetris)
+     * `C:\GAMES\PRINCE` (1989 Broderbund Prince of Persia — 256-Color VGA Mode 13h)
+     * `C:\GAMES\DIGGER` (1983 Windmill Software Digger)
+2. **`FDOS-128M.zip` (Base Clean Shell)**:  
+   * Minimal base FreeDOS 1.3 shell with DOS utilities and text editors.
 
 ---
 
@@ -35,6 +43,10 @@ The Next186 SoC contains a hardware **SPI Master Block Device Controller** imple
 ### Step 1: Unzip the Disk Image
 Unzip `FDOS-128M.zip` to obtain `FDOS-128M.img`:
 ```bash
+# Golden Image with pre-installed Games (Recommended):
+unzip FDOS-128M-with-games.zip
+
+# Or vanilla FreeDOS:
 unzip FDOS-128M.zip
 ```
 
