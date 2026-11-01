@@ -217,14 +217,14 @@ The 128 MB FreeDOS disk image is included in [`sdcard/FDOS-128M.zip`](sdcard/FDO
 The Next186 SoC core on the Tang Nano 9K interfaces with the MicroSD card socket over **SPI (Serial Peripheral Interface)** rather than 4-bit parallel SDIO. Hardware compatibility was empirically validated across multiple commercial cards:
 
 <p align="center">
-  <img src="assets/microsd_compatibility_matrix.jpg" width="70%" alt="Physical MicroSD Card Validation Testing (Kingston vs. Intenso)" />
+  <img src="assets/microsd_hardware_matrix.png" width="95%" alt="Physical MicroSD Card Validation Testing (Kingston vs. Intenso)" />
 </p>
 
 | Manufacturer & Model | Capacity | Speed Class | SPI Handshake (`CMD0` / `ACMD41`) | FreeDOS Boot Status | Architectural Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Kingston SDC10/4GB** | 4 GB | Class 10 (U1) | ✅ PASS (Sub-10ms response) | **BOOTS & RUNS ALL GAMES** | Golden production media: FreeDOS 1.3 + Tetris + PoP + Digger. |
 | **Kingston SDC4/16GB** | 16 GB | Class 4 | ✅ PASS (Reliable SPI sync) | **BOOTS FREEDOS** | Verified stable base DOS shell execution. |
-| **Intenso MicroSDHC** | 16 GB | Class 10 | ❌ FAIL (Timeout on init) | **FAILED (Cannot Init)** | Controller lacks full legacy SPI fallback mode state machine. |
+| **Intenso MicroSDHC** | 16 GB | Class 4 | ❌ FAIL (Timeout on init) | **FAILED (Cannot Init)** | Controller lacks full legacy SPI fallback mode state machine. |
 
 > [!WARNING]
 > **SPI Mode Hardware Prerequisite:**  
