@@ -164,7 +164,13 @@ Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
 
 ---
 
-## 🔧 Hardware Wiring (ESP32 to Tang Nano 9K)
+## 🔧 Hardware Implementation & Wiring (ESP32 to Tang Nano 9K)
+
+<p align="center">
+  <img src="assets/tang_nano_9k_board.png" height="340px" alt="Physical Sipeed Tang Nano 9K (Gowin GW1NR-LV9QN88PC6/I5) FPGA Board" />
+</p>
+
+<p align="center"><em>Physical Sipeed Tang Nano 9K hardware featuring the Gowin GW1NR-LV9QN88PC6/I5 FPGA core, HDMI TX port, and BL702 USB bridge.</em></p>
 
 *(Use any standard jumper wires — colors do not matter)*
 
@@ -281,6 +287,7 @@ NanoLink86/
 │   ├── pop_intro_demo.gif          # FreeDOS shell launch & Sultan's Palace palette fade-in
 │   ├── digger_cga_aliasing.png     # Digger 1983 CGA Mode 04h memory aliasing failure analysis
 │   ├── microsd_hardware_matrix.png # Studio MicroSD SPI protocol validation banner
+│   ├── tang_nano_9k_board.png      # High-resolution physical Tang Nano 9K board photograph
 │   └── card_*.png                  # Individual high-resolution MicroSD card assets
 ├── fpga/
 │   ├── Next186_S.fs                # Ready-to-flash compiled FPGA bitstream (3.55 MB)
