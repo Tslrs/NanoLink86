@@ -76,15 +76,29 @@ flowchart LR
 
 ### 🕹️ Real-Time Retro Gaming & Hardware Stress-Testing
 
-Real-time captures demonstrating interactive software execution and instant PS/2 keystroke injection through the Web Controller:
+Real-time captures demonstrating interactive software execution, live shell loading, and instant PS/2 keystroke injection through the Web Controller:
 
 <p align="center">
   <img src="assets/tetris_demo.gif" width="49%" alt="Live Tetris Gameplay on Tang Nano 9K FreeDOS (2:50 - 3:42)" />
-  <img src="assets/prince_of_persia_demo.gif" width="49%" alt="Prince of Persia Running in 256-Color VGA Mode 13h on FPGA" />
+  <img src="assets/pop_intro_demo.gif" width="49%" alt="Prince of Persia Shell Execution and VGA Mode 13h Palette Fade-in on FPGA" />
 </p>
 
 * **Left (FreeDOS Tetris — Interactive I/O & Interrupt Benchmark [02:50 - 03:42])**: Fast-paced interactive gameplay verifying bidirectional interrupt handling, timer ticks, and sub-millisecond PS/2 key injection over the wireless web bridge.
-* **Right (Prince of Persia 1989 — Static Framebuffer & 256-Color Palette Benchmark)**: Intentionally selected high-fidelity scene evaluating Gowin embedded PSRAM framebuffer stability, DVI clock phase alignment, and FAT16 asset streaming under full 320x200 256-color Mode 13h without introducing motion artifacts.
+* **Right (Prince of Persia 1989 — Shell Execution & 256-Color VGA Mode 13h Palette Benchmark)**: Real-time launch directly from the FreeDOS shell (`CD GAMES\PRINCE` -> `PRINCE.EXE`) demonstrating dynamic video mode switching, DAC palette register fade-in (`0x3C8`/`0x3C9`), and Gowin embedded PSRAM framebuffer throughput at 320x200 with zero HDMI clock jitter.
+
+#### 🔬 Hardware Architectural Analysis: Memory Aliasing (CGA vs. VGA Decoding)
+
+As part of the system-level validation, older real-mode titles were stress-tested to analyze video memory bus decoding:
+
+<p align="center">
+  <img src="assets/digger_cga_aliasing.png" width="85%" alt="Digger 1983 CGA Mode 04h Memory Aliasing Decoded as Text Mode 03h ASCII Characters" />
+</p>
+
+> [!NOTE]
+> **Architectural Memory Mapping Case Study:**  
+> When executing the original 1983 release of *Digger* (Windmill Software), the software writes raw 4-color bitmap data to legacy **CGA Mode 04h** (`0xB800:0000`).  
+> In the Next186 Verilog video core (`vga.v`), memory region `0xB800` is dedicated to **Text Mode 03h** (80x25 character/attribute pairs), while graphics modes are mapped to **VGA Mode 13h** (`0xA000:0000`). Because archaic CGA planar registers are intentionally omitted to optimize FPGA LUT utilization, the hardware video controller decodes the raw bitmap byte pairs as ASCII character codes and color attributes (rendering visible symbols such as `á`, `P`, `§`, and boundary blocks).  
+> In contrast, titles targeting native **VGA Mode 13h** (*Prince of Persia*) and BIOS text services (*Tetris*) achieve 100% pixel-perfect execution, validating the memory arbiter design.
 
 ---
 
