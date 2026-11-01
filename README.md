@@ -85,8 +85,8 @@ Real-time captures demonstrating interactive software execution, live shell load
   <img src="assets/prince_of_persia_demo.gif" width="49%" alt="Prince of Persia Level 1 Dungeon Running in 256-Color VGA Mode 13h on FPGA" />
 </p>
 
-* **Left (FreeDOS Tetris — Interactive I/O & Interrupt Benchmark [02:50 - 03:42])**: Fast-paced interactive gameplay verifying bidirectional interrupt handling, timer ticks, and sub-millisecond PS/2 key injection over the wireless web bridge.
-* **Right (Prince of Persia 1989 — Level 1 Dungeon 256-Color VGA Benchmark)**: High-fidelity dungeon gameplay scene evaluating Gowin embedded PSRAM framebuffer stability, dynamic animated torch palettes, and 256-color VGA Mode 13h fidelity.
+* **Left (FreeDOS Tetris — Live Gameplay)**: Real-time interactive gameplay verifying instant keyboard responsiveness, timer ticks, and smooth block rendering on the FPGA.
+* **Right (Prince of Persia 1989 — VGA Mode 13h)**: High-fidelity Level 1 dungeon scene demonstrating native 256-color VGA palette rendering and embedded PSRAM framebuffer stability.
 
 #### 2️⃣ Shell Launch Execution & Video Mode Switching
 
