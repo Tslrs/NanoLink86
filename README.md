@@ -151,10 +151,6 @@ Designed and debugged by **Tslrs** (Hardware & Architecture) collaborating with 
 
 ## 📊 FPGA Resource Utilization (Gowin GW1NR-9C)
 
-<p align="center">
-  <img src="assets/tang_nano_9k_board.png" height="300px" alt="Physical Sipeed Tang Nano 9K (Gowin GW1NR-LV9QN88PC6/I5) FPGA Board" />
-</p>
-
 Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
 
 | Resource Type | Used | Total Available | Utilization |
