@@ -151,6 +151,10 @@ Designed and debugged by **Tslrs** (Hardware & Architecture) collaborating with 
 
 ## 📊 FPGA Resource Utilization (Gowin GW1NR-9C)
 
+<p align="center">
+  <img src="assets/tang_nano_9k_board.png" height="300px" alt="Physical Sipeed Tang Nano 9K (Gowin GW1NR-LV9QN88PC6/I5) FPGA Board" />
+</p>
+
 Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
 
 | Resource Type | Used | Total Available | Utilization |
@@ -167,10 +171,10 @@ Compiled with Gowin EDA V1.9.12 PnR tool against `GW1NR-LV9QN88PC6/I5`:
 ## 🔧 Hardware Implementation & Wiring (ESP32 to Tang Nano 9K)
 
 <p align="center">
-  <img src="assets/tang_nano_9k_board.png" height="340px" alt="Physical Sipeed Tang Nano 9K (Gowin GW1NR-LV9QN88PC6/I5) FPGA Board" />
+  <img src="assets/hardware_breadboard_wiring.jpg" width="85%" alt="Physical Hardware Laboratory Setup: Tang Nano 9K and ESP32 Connected on Breadboard" />
 </p>
 
-<p align="center"><em>Physical Sipeed Tang Nano 9K hardware featuring the Gowin GW1NR-LV9QN88PC6/I5 FPGA core, HDMI TX port, and BL702 USB bridge.</em></p>
+<p align="center"><em>Live physical laboratory testbed: Sipeed Tang Nano 9K (top) connected via 3-wire PS/2 bit-bang bus (Pins 18, 19, GND) to the ESP32 wireless co-processor (bottom) with active HDMI display feed.</em></p>
 
 *(Use any standard jumper wires — colors do not matter)*
 
@@ -287,6 +291,7 @@ NanoLink86/
 │   ├── pop_intro_demo.gif          # FreeDOS shell launch & Sultan's Palace palette fade-in
 │   ├── digger_cga_aliasing.png     # Digger 1983 CGA Mode 04h memory aliasing failure analysis
 │   ├── microsd_hardware_matrix.png # Studio MicroSD SPI protocol validation banner
+│   ├── hardware_breadboard_wiring.jpg # Live physical breadboard laboratory testbed photograph
 │   ├── tang_nano_9k_board.png      # High-resolution physical Tang Nano 9K board photograph
 │   └── card_*.png                  # Individual high-resolution MicroSD card assets
 ├── fpga/
