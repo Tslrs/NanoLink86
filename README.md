@@ -74,6 +74,18 @@ flowchart LR
 * **Left (ROM Initialization)**: Next186 Chameleon SoC PC BIOS initializing on the Tang Nano 9K (80186 @ 18 MHz, 1 MB DDR, 15 GB SD Card, FreeDOS kernel build 2042).
 * **Right (Bare-Metal Shell)**: Functional FreeDOS 1.3 shell executing `VER` and `DIR` commands loaded directly from the MicroSD FAT16 master drive (`C:`).
 
+### 🕹️ Real-Time Retro Gaming & Hardware Stress-Testing
+
+Real-time captures demonstrating interactive software execution and instant PS/2 keystroke injection through the Web Controller:
+
+<p align="center">
+  <img src="assets/tetris_demo.gif" width="49%" alt="Live Tetris Gameplay on Tang Nano 9K FreeDOS (2:50 - 3:42)" />
+  <img src="assets/prince_of_persia_demo.gif" width="49%" alt="Prince of Persia Running in 256-Color VGA Mode 13h on FPGA" />
+</p>
+
+* **Left (FreeDOS Tetris — Live Gameplay Clip [02:50 - 03:42])**: Fast-paced interactive gameplay verifying bidirectional interrupt handling, timer ticks, and sub-millisecond PS/2 key injection over the wireless web bridge.
+* **Right (Prince of Persia 1989 — Hardware VGA Benchmark)**: Heavy commercial real-mode binary executing directly from the MicroSD FAT16 partition, validating the Next186 hardware 320x200 256-color Mode 13h DVI/HDMI framebuffer pipeline.
+
 ---
 
 ## ⚡ Power Consumption & Thermals
