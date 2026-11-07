@@ -14,6 +14,7 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
   * **Bluetooth Low Energy (BLE Wireless)** via Nordic UART Service (NUS) with zero network dependency.
   * **Wi-Fi Telemetry & WebSocket Relay** with Apple iOS 18 Glassmorphism console, smart captive portal (`NanoLink86-Setup`), UDP auto-discovery, and PHP audit tracking (`history.php`).
 * **ESP32 Hardware Co-Processor**: Native Xtensa machine code (Viper) bit-bang engine operating at an exact **12.5 kHz** PS/2 clock to transmit bit-perfect IBM AT Scan Code Set 2 frames to the FPGA.
+* **Retro Live Audio Telemetry**: Native 16-bit 80186 DOS visualizer (`dos_apps/LASTFM.COM`) streaming real-time Spotify / Last.fm scrobbles directly into FreeDOS Video RAM, with a master switch & settings gear (⚙️) to easily enable, disable, or configure custom usernames.
 * **Ultra-Low Power**: Tang Nano 9K board consumes **under 1 Watt** (~120 - 180 mA @ 5V). Silent, fanless, and runs for days on a small power bank!
 
 ---

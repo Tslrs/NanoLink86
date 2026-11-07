@@ -12,7 +12,9 @@ import json
 import os
 import struct
 import sys
+import subprocess
 import time
+import urllib.request
 
 try:
     sys.stdout.reconfigure(line_buffering=True)
@@ -33,8 +35,153 @@ CONFIG_FILE = os.path.join(DATA_DIR, "server_config.json")
 AUDIT_LOG_FILE = os.path.join(DATA_DIR, "audit_log.json")
 SERVER_START_TIME = time.time()
 
+# ======================================================================
+# SPOTIFY & LAST.FM RETRO LIVE AUDIO INTEGRATION
+# ======================================================================
+DEFAULT_LASTFM_USER = "your_username"
+AUDIO_CONFIG = {
+    "enabled": True,
+    "lastfm_user": DEFAULT_LASTFM_USER,
+    "lastfm_api_key": "b25b959554ed76058ac220b7b2e0a026",
+    "audio_source": "lastfm",       # 100% Pure Last.fm Live Scrobbler (Cloud decoupled)
+    "auto_sync_dos": True,
+    "display_style": "card"       # "card" or "echo"
+}
+
+is_dos_player_open = False
+
+GREEK_MAP = {
+    'α': 'a', 'ά': 'a', 'β': 'v', 'γ': 'g', 'δ': 'd', 'ε': 'e', 'έ': 'e',
+    'ζ': 'z', 'η': 'i', 'ή': 'i', 'θ': 'th', 'ι': 'i', 'ί': 'i', 'ϊ': 'i', 'ΐ': 'i',
+    'κ': 'k', 'λ': 'l', 'μ': 'm', 'ν': 'n', 'ξ': 'x', 'ο': 'o', 'ό': 'o',
+    'π': 'p', 'ρ': 'r', 'σ': 's', 'ς': 's', 'τ': 't', 'υ': 'y', 'ύ': 'y', 'ϋ': 'y', 'ΰ': 'y',
+    'φ': 'f', 'χ': 'ch', 'ψ': 'ps', 'ω': 'o', 'ώ': 'o',
+    'Α': 'A', 'Ά': 'A', 'Β': 'V', 'Γ': 'G', 'Δ': 'D', 'Ε': 'E', 'Έ': 'E',
+    'Ζ': 'Z', 'Η': 'I', 'Ή': 'I', 'Θ': 'Th', 'Ι': 'I', 'Ί': 'I',
+    'Κ': 'K', 'Λ': 'L', 'Μ': 'M', 'Ν': 'N', 'Ξ': 'X', 'Ο': 'O', 'Ό': 'O',
+    'Π': 'P', 'Ρ': 'R', 'Σ': 'S', 'Τ': 'T', 'Υ': 'Y', 'Ύ': 'Y',
+    'Φ': 'F', 'Χ': 'Ch', 'Ψ': 'Ps', 'Ω': 'O', 'Ώ': 'O'
+}
+
+def sanitize_dos_text(s: str) -> str:
+    res = []
+    for ch in str(s):
+        if ch in GREEK_MAP:
+            res.append(GREEK_MAP[ch])
+        elif ord(ch) < 128:
+            res.append(ch)
+    clean = "".join(res).strip()
+    return clean.replace("&", "+").replace("|", "-").replace("<", "[").replace(">", "]").replace("%", "").replace("^", "")
+
+def get_spotify_macos():
+    if sys.platform != "darwin":
+        return None
+    try:
+        cmd = """tell application "Spotify"
+            if it is running then
+                set tName to name of current track
+                set tArtist to artist of current track
+                set tAlbum to album of current track
+                set tState to player state as string
+                set tPos to player position as integer
+                set tDur to (duration of current track) / 1000 as integer
+                return tArtist & ":::" & tName & ":::" & tAlbum & ":::" & tState & ":::" & tPos & ":::" & tDur
+            else
+                return "NOT_RUNNING"
+            end if
+        end tell"""
+        proc = subprocess.run(["osascript", "-e", cmd], capture_output=True, text=True, timeout=1.5)
+        out = proc.stdout.strip()
+        if out and out != "NOT_RUNNING" and ":::" in out:
+            parts = out.split(":::")
+            artist, track, album, state = parts[0], parts[1], parts[2], parts[3]
+            pos_sec = int(parts[4]) if parts[4].isdigit() else 0
+            dur_sec = int(parts[5]) if parts[5].isdigit() else 0
+            return {
+                "ok": True,
+                "artist": artist,
+                "track": track,
+                "album": album,
+                "now_playing": (state == "playing"),
+                "position": pos_sec,
+                "duration": dur_sec,
+                "source": "macOS Spotify Native"
+            }
+    except Exception:
+        pass
+    return None
+
+def get_lastfm_track():
+    user = AUDIO_CONFIG.get("lastfm_user", DEFAULT_LASTFM_USER)
+    api_key = AUDIO_CONFIG.get("lastfm_api_key", "b25b959554ed76058ac220b7b2e0a026")
+    try:
+        url = f"https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={user}&api_key={api_key}&format=json&limit=1"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Macintosh; NanoLink86/1.0)"})
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            tracks = data.get("recenttracks", {}).get("track", [])
+            if tracks:
+                t = tracks[0]
+                artist = t.get("artist", {}).get("#text", "Unknown Artist")
+                title = t.get("name", "Unknown Track")
+                album = t.get("album", {}).get("#text", "")
+                now_playing = t.get("@attr", {}).get("nowplaying", "false") == "true"
+                return {
+                    "ok": True,
+                    "artist": artist,
+                    "track": title,
+                    "album": album,
+                    "now_playing": now_playing,
+                    "position": 0,
+                    "duration": 0,
+                    "source": f"Last.fm API ({user})"
+                }
+    except Exception as e:
+        return {"ok": False, "error": str(e), "source": f"Last.fm API ({user})"}
+    return {"ok": False, "error": "No tracks found", "source": f"Last.fm API ({user})"}
+
+def get_nowplaying_track():
+    # 100% Cloud-Native Last.fm Scrobbler API (Decoupled from local apps)
+    return get_lastfm_track()
+
+def generate_dos_card(track_info):
+    artist = sanitize_dos_text(track_info.get("artist", "Artist"))
+    title = sanitize_dos_text(track_info.get("track", "Track"))
+    album = sanitize_dos_text(track_info.get("album", "Album"))
+    state = "PLAYING" if track_info.get("now_playing") else "PAUSED"
+    
+    pos = track_info.get("position", 0)
+    dur = track_info.get("duration", 0)
+    pct = min(1.0, max(0.0, pos / dur)) if dur > 0 else 0
+    bar_len = 24
+    filled = int(bar_len * pct)
+    bar_str = "=" * filled + ">" + "-" * max(0, bar_len - filled - 1)
+    time_str = f"{pos//60}:{pos%60:02d} / {dur//60}:{dur%60:02d}" if dur > 0 else "Live Stream"
+
+    lines = [
+        "cls",
+        "echo ========================================================================",
+        "echo  ( ( o ) )           S P O T I F Y   F O R   D O S            [ v1.0 ]",
+        "echo                      Next186 SoC Audio Monitor",
+        "echo ========================================================================",
+        f"echo   TRACK    : {title}",
+        f"echo   ARTIST   : {artist}",
+        f"echo   ALBUM    : {album}",
+        f"echo   STATUS   : [ {state} ]",
+    ]
+    if dur > 0:
+        lines.append(f"echo   PROGRESS : [{bar_str}]  {time_str}")
+    else:
+        luser = AUDIO_CONFIG.get("lastfm_user", "user")
+        lines.append(f"echo   SOURCE   : Last.fm Live Audio ({luser})")
+    lines.extend([
+        "echo   SPECTRUM :  . : ! | ! : .   : ! | ! :   . : ! | ! : .",
+        "echo ========================================================================"
+    ])
+    return lines
+
 def load_server_config():
-    global AUTH_PIN
+    global AUTH_PIN, AUDIO_CONFIG
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "r") as f:
@@ -43,14 +190,34 @@ def load_server_config():
                 if len(pin) == 4 and pin.isdigit():
                     AUTH_PIN = pin
                     print(f"[CONFIG] Loaded Custom Security Passcode: {AUTH_PIN}")
+                if "enabled" in cfg:
+                    AUDIO_CONFIG["enabled"] = bool(cfg["enabled"])
+                if "lastfm_user" in cfg:
+                    AUDIO_CONFIG["lastfm_user"] = str(cfg["lastfm_user"]).strip()
+                if "audio_source" in cfg:
+                    AUDIO_CONFIG["audio_source"] = str(cfg["audio_source"]).strip()
+                if "auto_sync_dos" in cfg:
+                    AUDIO_CONFIG["auto_sync_dos"] = bool(cfg["auto_sync_dos"])
+                if "display_style" in cfg:
+                    AUDIO_CONFIG["display_style"] = str(cfg["display_style"]).strip()
+                print(f"[CONFIG] Audio Settings Loaded: {AUDIO_CONFIG}")
         except Exception as e:
             print("[CONFIG ERROR] Could not load server_config.json:", e)
 
 def save_server_config():
     try:
+        data = {
+            "auth_pin": AUTH_PIN,
+            "enabled": AUDIO_CONFIG.get("enabled", True),
+            "lastfm_user": AUDIO_CONFIG.get("lastfm_user", DEFAULT_LASTFM_USER),
+            "lastfm_api_key": AUDIO_CONFIG.get("lastfm_api_key", ""),
+            "audio_source": AUDIO_CONFIG.get("audio_source", "auto"),
+            "auto_sync_dos": AUDIO_CONFIG.get("auto_sync_dos", False),
+            "display_style": AUDIO_CONFIG.get("display_style", "card")
+        }
         with open(CONFIG_FILE, "w") as f:
-            json.dump({"auth_pin": AUTH_PIN}, f, indent=2)
-        print(f"[CONFIG] Saved Security Passcode to file: {AUTH_PIN}")
+            json.dump(data, f, indent=2)
+        print(f"[CONFIG] Saved Server & Audio Config: {CONFIG_FILE}")
     except Exception as e:
         print("[CONFIG ERROR] Could not save server_config.json:", e)
 
@@ -217,7 +384,9 @@ def get_stats_dict():
         "bytes_sent": session_stats["bytes_sent"],
         "packets_sent": session_stats["packets_sent"],
         "current_pin": AUTH_PIN,
-        "command_history": command_history[-10:]
+        "dos_player_open": is_dos_player_open,
+        "command_history": command_history[-10:],
+        "audio_config": AUDIO_CONFIG
     }
 
 # ======================================================================
@@ -915,8 +1084,33 @@ HTML_PAGE = f"""<!DOCTYPE html>
         <button class="magic-key" onclick="sendDirectCmd('Y\\r')">YES (Y)</button>
       </div>
 
+            <!-- LAST.FM NOW PLAYING RETRO TICKER -->
+      <div id="music-section">
+        <span class="section-label">Live Music Stream &bull; Last.fm</span>
+        <div style="background: rgba(30, 30, 36, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #e31b23, #ba000d); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(227,27,35,0.4);">
+              <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <div style="overflow: hidden;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="lfm-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #30d158; display: inline-block;"></span>
+                <span id="lfm-status" style="font-size: 11px; font-weight: 700; color: #30d158; letter-spacing: 0.5px;">NOW PLAYING</span>
+                <span style="font-size: 10px; color: rgba(235,235,245,0.45);">via Last.fm</span>
+              </div>
+              <div id="lfm-track" style="font-size: 14px; font-weight: 600; color: #FFF; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Φόρτωση τραγουδιού...</div>
+              <div id="lfm-artist" style="font-size: 12px; color: rgba(235,235,245,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Last.fm Audio</div>
+            </div>
+          </div>
+          <button id="btn-dos-player" onclick="toggleDosPlayer()" data-active="false" style="background: rgba(10, 132, 255, 0.18); border: 1px solid rgba(10, 132, 255, 0.45); color: #0A84FF; border-radius: 12px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; gap: 6px; transition: all 0.25s ease;">
+            <span id="btn-dos-player-ico">📻</span>
+            <span id="btn-dos-player-txt">Player: OFF</span>
+          </button>
+        </div>
+      </div>
+
       <span class="section-label">Real-Time Keyboard Input</span>
-      <div class="live-focus-box" onclick="focusInput()">
+      <div id="live-input-box" class="live-focus-box" onclick="focusInput()" style="transition: all 0.3s ease;">
         <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
         <input type="text" id="live-input" class="live-input-field" placeholder="Tap here to type in real-time..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
       </div>
@@ -1028,6 +1222,44 @@ HTML_PAGE = f"""<!DOCTYPE html>
         </div>
         <div style="margin-top: 10px;">
           <button class="btn-secondary" onclick="resetSessionStats()">Reset Session Statistics</button>
+        </div>
+      </div>
+
+      <span class="section-label">Audio &amp; Spotify DOS Settings</span>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Enable Live Music Player</div>
+            <div class="settings-desc">Show Spotify/Last.fm player widget in Console</div>
+          </div>
+          <input type="checkbox" id="cfg-music-enabled" onchange="toggleMusicFeature(this.checked)" style="width: 22px; height: 22px; accent-color: #30D158; cursor: pointer;">
+        </div>
+        <div class="settings-row" style="margin-top: 10px;">
+          <div>
+            <div class="settings-label">Last.fm Username</div>
+            <div class="settings-desc">User for scrobbles / Now Playing</div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="cfg-lfm-user" placeholder="username" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #FFF; padding: 6px 10px; font-size: 13px; width: 110px;">
+            <button onclick="saveLfmUser()" style="background: #0A84FF; border: none; border-radius: 8px; color: #FFF; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer;">Save</button>
+          </div>
+        </div>
+        <div class="settings-row" style="margin-top: 10px;">
+          <div>
+            <div class="settings-label">Auto-Draw to DOS Screen</div>
+            <div class="settings-desc">Stream live updates when player is open</div>
+          </div>
+          <input type="checkbox" id="cfg-auto-sync" onchange="toggleAudioAutoSync(this.checked)" style="width: 22px; height: 22px; accent-color: #30D158; cursor: pointer;">
+        </div>
+        <div class="settings-row" style="margin-top: 10px;">
+          <div>
+            <div class="settings-label">Display Style</div>
+            <div class="settings-desc">Layout painted onto FreeDOS</div>
+          </div>
+          <select id="cfg-display-style" onchange="setDisplayStyle(this.value)" style="background: #1c1c1e; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #FFF; padding: 6px 8px; font-size: 12px;">
+            <option value="card">Retro Player Card (CLS + Box)</option>
+            <option value="echo">Single Line Prompt (echo)</option>
+          </select>
         </div>
       </div>
     </div>
@@ -1173,6 +1405,25 @@ function tryAuth() {{
           const pinEl = document.getElementById("current-pin-badge");
           if (pinEl && msg.current_pin) pinEl.textContent = msg.current_pin;
 
+          if (msg.audio_config) {{
+            const isEnabled = msg.audio_config.enabled !== false;
+            const sec = document.getElementById("music-section");
+            if (sec) sec.style.display = isEnabled ? "block" : "none";
+            const chkEn = document.getElementById("cfg-music-enabled");
+            if (chkEn && !chkEn.dataset.touched) chkEn.checked = isEnabled;
+
+            const chk = document.getElementById("cfg-auto-sync");
+            if (chk && !chk.dataset.touched) chk.checked = !!msg.audio_config.auto_sync_dos;
+            const usr = document.getElementById("cfg-lfm-user");
+            if (usr && !usr.dataset.touched && document.activeElement !== usr) usr.value = msg.audio_config.lastfm_user || "";
+            const sty = document.getElementById("cfg-display-style");
+            if (sty && !sty.dataset.touched) sty.value = msg.audio_config.display_style || "card";
+          }}
+
+          if (typeof msg.dos_player_open !== 'undefined') {{
+            applyDosPlayerState(!!msg.dos_player_open);
+          }}
+
           // Command audit list
           const auditList = document.getElementById("audit-list");
           if (auditList && msg.command_history) {{
@@ -1218,6 +1469,96 @@ function tryAuth() {{
 // ======================================================================
 // REAL-TIME INSTANTANEOUS KEYBOARD DISPATCHER
 // ======================================================================
+// Last.fm Live Poll & Dispatcher
+async function updateLastfmWidget() {{
+  try {{
+    const res = await fetch('/api/nowplaying');
+    const data = await res.json();
+    if (data.ok) {{
+      document.getElementById('lfm-track').innerText = data.track || 'No Track';
+      document.getElementById('lfm-artist').innerText = (data.artist || '') + (data.album ? ' • ' + data.album : '');
+      const dot = document.getElementById('lfm-dot');
+      const st = document.getElementById('lfm-status');
+      if (data.now_playing) {{
+        dot.style.background = '#30d158';
+        st.innerText = 'NOW PLAYING';
+        st.style.color = '#30d158';
+      }} else {{
+        dot.style.background = '#8e8e93';
+        st.innerText = 'LAST PLAYED';
+        st.style.color = '#8e8e93';
+      }}
+    }}
+  }} catch (err) {{}}
+}}
+setInterval(updateLastfmWidget, 4000);
+setTimeout(updateLastfmWidget, 600);
+
+function toggleDosPlayer() {{
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const btn = document.getElementById("btn-dos-player");
+  if (btn && btn.disabled) return;
+  if (btn) {{
+    btn.disabled = true;
+    setTimeout(() => {{ if (btn) btn.disabled = false; }}, 800);
+  }}
+  const isCurrentlyActive = btn && btn.dataset.active === "true";
+  const newState = !isCurrentlyActive;
+  ws.send(JSON.stringify({{ type: "toggle_dos_player", active: newState }}));
+  applyDosPlayerState(newState);
+  if (newState) {{
+    showNotification("🎵 Player ON: Άνοιξε στο DOS & κλειδώθηκε το πληκτρολόγιο!");
+  }} else {{
+    showNotification("⏹ Player OFF: Επιστροφή στο C:\\> & ξεκλείδωμα πληκτρολογίου!");
+  }}
+}}
+
+function applyDosPlayerState(active) {{
+  const btn = document.getElementById("btn-dos-player");
+  const txt = document.getElementById("btn-dos-player-txt");
+  const ico = document.getElementById("btn-dos-player-ico");
+  const inp = document.getElementById("live-input");
+  const box = document.getElementById("live-input-box");
+
+  if (btn) btn.dataset.active = active ? "true" : "false";
+
+  if (active) {{
+    if (btn) {{
+      btn.style.background = "rgba(48, 209, 88, 0.25)";
+      btn.style.borderColor = "#30d158";
+      btn.style.color = "#30d158";
+      btn.style.boxShadow = "0 0 12px rgba(48, 209, 88, 0.35)";
+    }}
+    if (txt) txt.textContent = "Player: ON";
+    if (ico) ico.textContent = "🟢";
+    if (inp) {{
+      inp.disabled = true;
+      inp.placeholder = "🔒 DOS Player Active - Locked to protect music screen";
+    }}
+    if (box) {{
+      box.style.opacity = "0.45";
+      box.style.filter = "grayscale(60%)";
+    }}
+  }} else {{
+    if (btn) {{
+      btn.style.background = "rgba(10, 132, 255, 0.18)";
+      btn.style.borderColor = "rgba(10, 132, 255, 0.45)";
+      btn.style.color = "#0A84FF";
+      btn.style.boxShadow = "none";
+    }}
+    if (txt) txt.textContent = "Player: OFF";
+    if (ico) ico.textContent = "📻";
+    if (inp) {{
+      inp.disabled = false;
+      inp.placeholder = "Tap here to type in real-time...";
+    }}
+    if (box) {{
+      box.style.opacity = "1.0";
+      box.style.filter = "none";
+    }}
+  }}
+}}
+
 function focusInput() {{
   const inp = document.getElementById("live-input");
   if (inp) inp.focus();
@@ -1292,25 +1633,45 @@ liveInput.addEventListener("keydown", (e) => {{
     sendSingleKey("\\t");
   }} else if (e.key === "ArrowUp") {{
     e.preventDefault();
+    sendSingleKey("8");
     sendSingleKey("UP");
   }} else if (e.key === "ArrowDown") {{
     e.preventDefault();
+    sendSingleKey("2");
     sendSingleKey("DOWN");
   }} else if (e.key === "ArrowLeft") {{
     e.preventDefault();
+    sendSingleKey("4");
     sendSingleKey("LEFT");
   }} else if (e.key === "ArrowRight") {{
     e.preventDefault();
+    sendSingleKey("6");
     sendSingleKey("RIGHT");
   }}
 }});
 
-// Global window keyboard listener for Desktop Safari
+// Global window keyboard listener for Desktop Safari & Chrome
 window.addEventListener("keydown", (e) => {{
   if (document.getElementById("view-deck").style.display === "block") {{
     const consolePane = document.getElementById("pane-console");
     if (consolePane && consolePane.style.display !== "none") {{
-      if (document.activeElement !== liveInput) {{
+      if (e.key === "ArrowUp") {{
+        e.preventDefault();
+        sendSingleKey("8");
+        sendSingleKey("UP");
+      }} else if (e.key === "ArrowDown") {{
+        e.preventDefault();
+        sendSingleKey("2");
+        sendSingleKey("DOWN");
+      }} else if (e.key === "ArrowLeft") {{
+        e.preventDefault();
+        sendSingleKey("4");
+        sendSingleKey("LEFT");
+      }} else if (e.key === "ArrowRight") {{
+        e.preventDefault();
+        sendSingleKey("6");
+        sendSingleKey("RIGHT");
+      }} else if (document.activeElement !== liveInput) {{
         focusInput();
         if (e.key === "Enter" || e.keyCode === 13) {{
           e.preventDefault();
@@ -1409,6 +1770,42 @@ function changePasscodePin() {{
   }}
 }}
 
+function toggleMusicFeature(enabled) {{
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const chk = document.getElementById("cfg-music-enabled");
+  if (chk) chk.dataset.touched = "true";
+  const sec = document.getElementById("music-section");
+  if (sec) sec.style.display = enabled ? "block" : "none";
+  ws.send(JSON.stringify({{ type: "update_audio_settings", enabled: enabled }}));
+  showNotification(enabled ? '🎵 Music Telemetry ενεργοποιήθηκε!' : '⏹ Music Telemetry απενεργοποιήθηκε.');
+}}
+
+function toggleAudioAutoSync(enabled) {{
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const chk = document.getElementById("cfg-auto-sync");
+  if (chk) chk.dataset.touched = "true";
+  ws.send(JSON.stringify({{ type: "update_audio_settings", auto_sync_dos: enabled }}));
+  showNotification(enabled ? '🎵 Auto-Sync to FreeDOS ενεργοποιήθηκε!' : 'Auto-Sync απενεργοποιήθηκε.');
+}}
+
+function saveLfmUser() {{
+  const inp = document.getElementById("cfg-lfm-user");
+  if (!inp || !ws || ws.readyState !== WebSocket.OPEN) return;
+  inp.dataset.touched = "true";
+  const user = inp.value.trim();
+  if (!user) return;
+  ws.send(JSON.stringify({{ type: "update_audio_settings", lastfm_user: user }}));
+  showNotification('👤 Χρήστης Last.fm: ' + user);
+}}
+
+function setDisplayStyle(style) {{
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const sty = document.getElementById("cfg-display-style");
+  if (sty) sty.dataset.touched = "true";
+  ws.send(JSON.stringify({{ type: "update_audio_settings", display_style: style }}));
+  showNotification('🎨 Display Style: ' + style);
+}}
+
 // Restore saved theme on load
 try {{
   const saved = localStorage.getItem('nanolink_theme');
@@ -1488,6 +1885,23 @@ async def handle_http_client(reader: asyncio.StreamReader, writer: asyncio.Strea
             await writer.wait_closed()
             return
 
+        # REST API endpoint for Live Last.fm & Spotify Now Playing
+        if path in ["/api/nowplaying", "/api/lastfm", "/nowplaying.json"]:
+            lfm_data = get_nowplaying_track()
+            lfm_json = json.dumps(lfm_data, indent=2).encode("utf-8")
+            resp = (
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: application/json; charset=utf-8\r\n"
+                "Access-Control-Allow-Origin: *\r\n"
+                f"Content-Length: {len(lfm_json)}\r\n"
+                "Connection: close\r\n\r\n"
+            ).encode("utf-8") + lfm_json
+            writer.write(resp)
+            await writer.drain()
+            writer.close()
+            await writer.wait_closed()
+            return
+
         # REST API endpoint for Live Statistics
         if path in ["/stats", "/api/stats", "/telemetry", "/stats.json"]:
             stats_json = json.dumps(get_stats_dict(), indent=2).encode("utf-8")
@@ -1527,7 +1941,7 @@ async def handle_http_client(reader: asyncio.StreamReader, writer: asyncio.Strea
             pass
 
 async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, path: str, client_ip: str = "127.0.0.1", user_agent: str = ""):
-    global esp32_client, AUTH_PIN
+    global esp32_client, AUTH_PIN, is_dos_player_open, last_auto_track_id
     token = ""
     if "token=" in path:
         token = path.split("token=")[1].split("&")[0]
@@ -1582,6 +1996,17 @@ async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.Stream
                 mtype = msg.get("type")
                 if mtype == "key":
                     char_data = msg.get("data", "")
+                    if is_dos_player_open:
+                        # Screen is locked in Audio Mode to prevent interfering with music!
+                        # Only 'q', 'Q', or ESC (0x1b) can exit!
+                        if char_data.lower() == "q" or char_data == "\x1b":
+                            is_dos_player_open = False
+                            print("[DOS APP] Player closed via Q/ESC keystroke. Keyboard unlocked.")
+                            broadcast_stats()
+                        else:
+                            print(f"[DOS APP] Keystroke {repr(char_data)} blocked: Player is active and keyboard is locked.")
+                            continue
+
                     now = time.time()
                     
                     for _ in char_data:
@@ -1607,6 +2032,10 @@ async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.Stream
                             if len(command_history) > 20:
                                 command_history.pop(0)
 
+                            if full_cmd.startswith("SPOTIFY") or full_cmd.startswith("LASTFM"):
+                                is_dos_player_open = True
+                                print(f"[DOS APP] Player opened via command '{full_cmd}'. Auto-sync activated!")
+
                             # Record audit log for PHP dashboard!
                             record_audit_event("command", {
                                 "command": full_cmd,
@@ -1616,6 +2045,11 @@ async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.Stream
                             })
                             print(f"[AUDIT] ⌨️ Command: '{full_cmd}' by {device_name} ({client_ip})")
                         client_cmd_buf = ""
+                    elif char_data.lower() == "q" or char_data == "\x1b":
+                        is_dos_player_open = False
+                        print("[DOS APP] Player closed (Q/ESC detected). Auto-sync paused.")
+                        if char_data not in ["UP", "DOWN", "LEFT", "RIGHT", "\x1b", "\t"]:
+                            client_cmd_buf += char_data
                     elif char_data == "\x08":
                         if len(client_cmd_buf) > 0:
                             client_cmd_buf = client_cmd_buf[:-1]
@@ -1642,6 +2076,67 @@ async def process_websocket(reader: asyncio.StreamReader, writer: asyncio.Stream
 
                     # Real-time stats push
                     broadcast_stats()
+
+                elif mtype == "send_nowplaying":
+                    track_data = get_nowplaying_track()
+                    if track_data.get("ok"):
+                        await draw_track_to_dos(track_data)
+                    else:
+                        print("[AUDIO] Track data fetch failed:", track_data)
+
+                elif mtype == "toggle_dos_player":
+                    active = bool(msg.get("active", False))
+                    if active:
+                        is_dos_player_open = True
+                        track_data = get_nowplaying_track()
+                        if track_data.get("ok"):
+                            artist = sanitize_dos_text(track_data.get("artist", "Artist"))
+                            title = sanitize_dos_text(track_data.get("track", "Track"))
+                            clean_track = f"{artist} - {title}".replace('"', '').replace("'", "")
+                            last_auto_track_id = f"{track_data.get('artist')} - {track_data.get('track')}"
+                            dos_cmd = f"LASTFM {clean_track}\r"
+                        else:
+                            dos_cmd = "LASTFM\r"
+                        
+                        if esp32_client:
+                            try:
+                                for ch in dos_cmd:
+                                    if not is_dos_player_open:
+                                        break
+                                    payload = json.dumps({"k": ch}) + "\n"
+                                    esp32_client.write(payload.encode("utf-8"))
+                                    await esp32_client.drain()
+                                    await asyncio.sleep(0.025)
+                            except Exception as e:
+                                print("[DOS LAUNCH ERR]", e)
+                        print("[DOS APP] Master Switch turned ON: LASTFM Player launched & Screen locked!")
+                    else:
+                        is_dos_player_open = False
+                        last_auto_track_id = ""
+                        if esp32_client:
+                            try:
+                                payload = json.dumps({"k": "q"}) + "\n"
+                                esp32_client.write(payload.encode("utf-8"))
+                                await esp32_client.drain()
+                                print("[DOS APP] Master Switch turned OFF: Sent 'q' to exit to C:\\> prompt.")
+                            except Exception as e:
+                                print("[DOS EXIT ERR]", e)
+                    broadcast_stats()
+
+                elif mtype == "update_audio_settings":
+                    if "enabled" in msg:
+                        AUDIO_CONFIG["enabled"] = bool(msg["enabled"])
+                    if "lastfm_user" in msg:
+                        AUDIO_CONFIG["lastfm_user"] = str(msg["lastfm_user"]).strip()
+                    if "audio_source" in msg:
+                        AUDIO_CONFIG["audio_source"] = str(msg["audio_source"]).strip()
+                    if "auto_sync_dos" in msg:
+                        AUDIO_CONFIG["auto_sync_dos"] = bool(msg["auto_sync_dos"])
+                    if "display_style" in msg:
+                        AUDIO_CONFIG["display_style"] = str(msg["display_style"]).strip()
+                    save_server_config()
+                    broadcast_stats()
+                    print(f"[CONFIG] Audio Settings Updated: {AUDIO_CONFIG}")
 
                 elif mtype == "cad":
                     if esp32_client:
@@ -1738,6 +2233,82 @@ def broadcast_stats():
 def broadcast_status():
     broadcast_stats()
 
+is_dos_player_open = False
+last_auto_track_id = ""
+
+async def draw_track_to_dos(track_data):
+    global esp32_client, is_dos_player_open, last_auto_track_id
+    if not esp32_client:
+        return
+    artist = sanitize_dos_text(track_data.get("artist", "Artist"))
+    title = sanitize_dos_text(track_data.get("track", "Track"))
+    clean_track = f"{artist} - {title}".replace('"', '').replace("'", "")
+    last_auto_track_id = f"{track_data.get('artist')} - {track_data.get('track')}"
+    
+    if is_dos_player_open:
+        # Player is already running: send live update packet ;<track>\r
+        update_pkt = f";{clean_track}\r"
+        try:
+            for ch in update_pkt:
+                payload = json.dumps({"k": ch}) + "\n"
+                esp32_client.write(payload.encode("utf-8"))
+                await esp32_client.drain()
+                await asyncio.sleep(0.025)
+            print(f"[AUDIO ➔ DOS] Sent live track update: {clean_track}")
+        except Exception as relay_e:
+            print("[AUDIO RELAY ERR]", relay_e)
+    else:
+        # Launch LASTFM with clean track argument
+        dos_cmd = f"LASTFM {clean_track}\r"
+        is_dos_player_open = True
+        try:
+            for ch in dos_cmd:
+                payload = json.dumps({"k": ch}) + "\n"
+                esp32_client.write(payload.encode("utf-8"))
+                await esp32_client.drain()
+                await asyncio.sleep(0.025)
+            print(f"[AUDIO ➔ DOS] Launched program: {dos_cmd.strip()}")
+        except Exception as relay_e:
+            print("[AUDIO RELAY ERR]", relay_e)
+
+async def audio_sync_ticker():
+    global last_auto_track_id, is_dos_player_open
+    while True:
+        try:
+            await asyncio.sleep(3.0)
+            if not AUDIO_CONFIG.get("enabled", True):
+                continue
+            if not AUDIO_CONFIG.get("auto_sync_dos"):
+                continue
+            if not esp32_client:
+                continue
+            if not is_dos_player_open:
+                continue
+            
+            t = get_nowplaying_track()
+            if t.get("ok") and t.get("track"):
+                tid = f"{t.get('artist')} - {t.get('track')}"
+                if tid != last_auto_track_id:
+                    print(f"[AUTO-SYNC] Live Track Changed: {tid} -> Updating Screen...")
+                    last_auto_track_id = tid
+                    artist = sanitize_dos_text(t.get("artist", "Artist"))
+                    title = sanitize_dos_text(t.get("track", "Track"))
+                    clean_track = f"{artist} - {title}".replace('"', '').replace("'", "")
+                    # Send live update packet ;<track>\r directly to running LASTFM.COM
+                    update_pkt = f";{clean_track}\r"
+                    for ch in update_pkt:
+                        if not is_dos_player_open:
+                            print("[AUTO-SYNC] Relay stopped early: Player was turned OFF!")
+                            break
+                        payload = json.dumps({"k": ch}) + "\n"
+                        esp32_client.write(payload.encode("utf-8"))
+                        await esp32_client.drain()
+                        await asyncio.sleep(0.025)
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            pass
+
 async def stats_ticker():
     """Background task that pushes fresh telemetry every second."""
     while True:
@@ -1816,9 +2387,10 @@ async def main():
     )
 
     ticker_task = asyncio.create_task(stats_ticker())
+    audio_task = asyncio.create_task(audio_sync_ticker())
 
     async with server_http, server_esp:
-        await asyncio.gather(server_http.serve_forever(), server_esp.serve_forever(), ticker_task)
+        await asyncio.gather(server_http.serve_forever(), server_esp.serve_forever(), ticker_task, audio_task)
 
 if __name__ == "__main__":
     try:
