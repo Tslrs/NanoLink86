@@ -68,12 +68,14 @@ flowchart LR
 ## 📺 Live Hardware Demos & Execution
 
 <p align="center">
-  <img src="assets/demo_bios_boot.png" width="49%" alt="Next186 BIOS Boot Screen on Tang Nano 9K" />
-  <img src="assets/demo_freedos_exec.png" width="49%" alt="FreeDOS 1.3 Shell Execution" />
+  <img src="assets/demo_bios_boot.png" width="32%" alt="Next186 BIOS Boot Screen on Tang Nano 9K" />
+  <img src="assets/demo_freedos_exec.png" width="32%" alt="FreeDOS 1.3 Shell Execution" />
+  <img src="assets/demo_audio_player_terminal.png" width="32%" alt="FreeDOS 1.3 Live Audio Player Terminal (LASTFM.COM)" />
 </p>
 
 * **Left (ROM Initialization)**: Next186 Chameleon SoC PC BIOS initializing on the Tang Nano 9K (80186 @ 18 MHz, 1 MB DDR, 15 GB SD Card, FreeDOS kernel build 2042).
-* **Right (Bare-Metal Shell)**: Functional FreeDOS 1.3 shell executing `VER` and `DIR` commands loaded directly from the MicroSD FAT16 master drive (`C:`).
+* **Center (Bare-Metal Shell)**: Functional FreeDOS 1.3 shell executing `VER` and `DIR` commands loaded directly from the MicroSD FAT16 master drive (`C:`).
+* **Right (Live Audio Telemetry)**: Native 16-bit 80186 `LASTFM.COM` visualizer streaming real-time Spotify scrobbles directly into FreeDOS Video RAM (`0xB800`).
 
 ### 🕹️ Real-Time Retro Gaming & Hardware Stress-Testing
 
@@ -102,7 +104,7 @@ Real-time captures demonstrating interactive software execution, live shell load
 #### 3️⃣ Retro Live Audio Telemetry & Spotify Stream
 
 <p align="center">
-  <img src="assets/live_audio_player_demo.png" width="80%" alt="FreeDOS Live Audio Visualizer Terminal on Tang Nano 9K" />
+  <img src="assets/demo_audio_player_terminal.png" width="80%" alt="FreeDOS Live Audio Visualizer Terminal on Tang Nano 9K" />
 </p>
 
 * **Real-Time Spotify / Last.fm Telemetry**: Real-time song streaming from modern streaming services into native 16-bit 80186 Video RAM (`0xB800`) running inside FreeDOS on the Tang Nano 9K FPGA (`dos_apps/LASTFM.COM`).
