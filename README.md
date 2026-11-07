@@ -102,7 +102,7 @@ Real-time captures demonstrating interactive software execution, live shell load
 #### 3️⃣ Retro Live Audio Telemetry & Spotify Stream
 
 <p align="center">
-  <img src="assets/live_audio_player_demo.png" width="95%" alt="Retro Live Audio Telemetry: Spotify Stream running in FreeDOS Video RAM via NanoLink86" />
+  <img src="assets/live_audio_player_demo.png" width="80%" alt="FreeDOS Live Audio Visualizer Terminal on Tang Nano 9K" />
 </p>
 
 * **Real-Time Spotify / Last.fm Telemetry**: Real-time song streaming from modern streaming services into native 16-bit 80186 Video RAM (`0xB800`) running inside FreeDOS on the Tang Nano 9K FPGA (`dos_apps/LASTFM.COM`).
