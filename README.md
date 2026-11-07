@@ -99,6 +99,15 @@ Real-time captures demonstrating interactive software execution, live shell load
 * **Left (Prince of Persia — FreeDOS Shell Execution & Palette Fade-in)**: Real-time launch directly from the FreeDOS shell prompt (`CD GAMES\PRINCE` ➔ `PRINCE.EXE`) demonstrating dynamic video mode initialization, DAC palette register fading (`0x3C8`/`0x3C9`), and Sultan's Palace scene rendering at 320x200 with zero HDMI clock jitter.
 * **Right (Digger 1983 — CGA Memory Aliasing Failure Analysis)**: Hardware behavior when executing legacy CGA Mode 04h (`0xB800`) software on an FPGA core implementing Text Mode 03h (`0xB800`) and VGA Mode 13h (`0xA000`).
 
+#### 3️⃣ Retro Live Audio Telemetry & Spotify Stream
+
+<p align="center">
+  <img src="assets/live_audio_player_demo.png" width="95%" alt="Retro Live Audio Telemetry: Spotify Stream running in FreeDOS Video RAM via NanoLink86" />
+</p>
+
+* **Real-Time Spotify / Last.fm Telemetry**: Real-time song streaming from modern streaming services into native 16-bit 80186 Video RAM (`0xB800`) running inside FreeDOS on the Tang Nano 9K FPGA (`dos_apps/LASTFM.COM`).
+* **Bi-Directional Synchronous Control**: Controlled directly via the Web Console Master Switch with keyboard shield protection and customizable Settings gear (⚙️) to configure personal usernames or toggle the visualizer on and off.
+
 > [!NOTE]
 > **Architectural Memory Mapping Case Study:**  
 > When executing the original 1983 release of *Digger* (Windmill Software), the software writes raw 4-color bitmap data to legacy **CGA Mode 04h** (`0xB800:0000`).  
