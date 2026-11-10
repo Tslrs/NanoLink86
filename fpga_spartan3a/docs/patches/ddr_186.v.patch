@@ -1,0 +1,113 @@
+--- upstream/HW/ddr_186.v
++++ ours/HW/ddr_186.v
+@@ -158,6 +158,7 @@
+ 	wire WR;
+ 	wire INTA;
+ 	wire WORD;
++	wire MREQ;
+ 	wire [3:0] RAM_WMASK;
+ 	wire cntrl0_ar_done;
+ 	wire cntrl0_auto_ref_req;
+@@ -267,7 +268,11 @@
+ 	
+ // SD interface
+ 	reg [7:0]SDI;
+-	assign SD_DI = CPU_DOUT[7];
++	reg [7:0]sd_dout;
++	reg [8:0]sd_dct = 0; 
++	reg sd_bsy = 0;
++	reg sd_run = 0;
++	assign SD_DI = sd_dout[7];
+ 
+ 	assign PORT_IN[15:8] = { ({8{MEMORY_MAP}} & {6'b000000, memmap[9:8]}) |
+ 									 ({8{INPUT_STATUS_OE}} & SDI)
+@@ -427,13 +432,33 @@
+ 	  .doutb(VGA_FONT_DATA) // output [7 : 0] doutb
+ 	);
+ 	
++	wire bios_cs = MREQ && (ADDR[19:13] == 7'b1111_111);
++	reg bios_cs_d = 0;
++	// FIX: only advance the read-mux select while the CPU/BIU is enabled (CE).
++	// Otherwise a BIOS fetch followed by a cache miss loses the BIOS data word.
++	always @(posedge clk_cpu) begin
++		if(CE) bios_cs_d <= bios_cs;
++	end
++
++	wire [31:0] bios_dout;
++	bios_ram u_bios_ram (
++		.clk(clk_cpu),
++		.ce(bios_cs),
++		.we(RAM_WMASK & {4{WR}}),
++		.addr(ADDR[12:2]),
++		.din(DOUT),
++		.dout(bios_dout)
++	);
++
++	wire [31:0] cpu_din = bios_cs_d ? bios_dout : DRAM_dout;
++
+ 	cache_controller cache_ctl 
+ 	(
+ 		 .addr(ADDR), 
+ 		 .dout(DRAM_dout), 
+ 		 .din(DOUT), 
+ 		 .clk(clk_cpu), 
+-		 .mreq(MREQ), 
++		 .mreq(MREQ & ~bios_cs), 
+ 		 .wr(WR),
+ 		 .wmask(RAM_WMASK),	 
+ 		 .ce(CE), 
+@@ -489,14 +514,14 @@
+ 	unit186 CPUUnit
+ 	(
+ 		 .INPORT(INTA ? PIC_IVECT : PORT_IN), 
+-		 .DIN(DRAM_dout), 
++		 .DIN(cpu_din), 
+ 		 .CPU_DOUT(CPU_DOUT),
+ 		 .PORT_ADDR(PORT_ADDR),
+ 		 .DOUT(DOUT), 
+ 		 .ADDR(ADDR), 
+ 		 .WMASK(RAM_WMASK), 
+ 		 .CLK(clk_cpu), 
+-		 .CE(CE), 
++		 .CE(CE && !(IORQ && INPUT_STATUS_OE && !WR && sd_run)), 
+ 		 .CPU_CE(CPU_CE),
+ 		 .INTR(INT), 
+ 		 .NMI(rNMI[9]), 
+@@ -715,11 +740,35 @@
+ 		end
+ // SD
+ 		if(CPU_CE) begin
+-			SD_CK <= IORQ & INPUT_STATUS_OE & WR & ~WORD;
+ 			if(IORQ & INPUT_STATUS_OE & WR) begin
+ 				if(WORD) SD_CS <= ~CPU_DOUT[8]; // SD chip select
+-				else SDI <= {SDI[6:0], SD_DO};
+ 			end
++		end
++
++		if(rstcount[4]) begin
++			if(IORQ & INPUT_STATUS_OE && CPU_CE) begin
++				if(WR && ~WORD && ~sd_bsy) begin
++					sd_dout <= CPU_DOUT[7:0]; 
++					sd_dct <= 9'd255;
++					sd_bsy <= 1; 
++					sd_run <= 1;
++				end
++				if(~WR && WORD) sd_bsy <= 0;
++			end
++
++			if(sd_run) begin	
++				SD_CK <= sd_dct[4];
++				if(sd_dct[4:0] == 5'b01111) begin
++					sd_dout <= {sd_dout[6:0], 1'b0};
++					SDI  <= {SDI[6:0], SD_DO};
++				end 
++				if(sd_dct == 0) sd_run <= 0; 
++				else          sd_dct <= sd_dct - 9'd1;
++			end
++		end else begin
++			sd_bsy <= 0;
++			sd_run <= 0;
++			SD_CK <= 0;
+ 		end
+ 
+ 		if(KB_RST) rstcount <= 0;
