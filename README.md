@@ -1,6 +1,9 @@
-# NanoLink86 · Next186 SoC FreeDOS on Tang Nano 9K with Web Hardware Controller
+# NanoLink86 · Next186 SoC FreeDOS on Tang Nano 9K and Spartan-3A, with a Web Hardware Controller
 
-An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the **Sipeed Tang Nano 9K** (Gowin GW1NR-9C FPGA), controlled in real-time through an ultra-low latency static Web Interface (**Web Serial & Web Bluetooth**) running directly in modern web browsers or deployed on GitHub Pages.
+An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on two FPGA boards:
+the **Sipeed Tang Nano 9K** (Gowin GW1NR-9C) and the **Xilinx Spartan-3A Starter Kit**
+(XC3S700A). Both are controlled in real time by the same ESP32 PS/2 keyboard co-processor and
+the same Web Interface (**Web Serial & Web Bluetooth**).
 
 ---
 
@@ -16,6 +19,18 @@ An end-to-end open-source project running **FreeDOS (x86 PC-compatible)** on the
 * **ESP32 Hardware Co-Processor**: Native Xtensa machine code (Viper) bit-bang engine operating at an exact **12.5 kHz** PS/2 clock to transmit bit-perfect IBM AT Scan Code Set 2 frames to the FPGA.
 * **Retro Live Audio Telemetry**: Native 16-bit 80186 DOS visualizer (`dos_apps/LASTFM.COM`) streaming real-time Spotify / Last.fm scrobbles directly into FreeDOS Video RAM, with a master switch & settings gear (⚙️) to easily enable, disable, or configure custom usernames.
 * **Ultra-Low Power**: Tang Nano 9K board consumes **under 1 Watt** (~120 - 180 mA @ 5V). Silent, fanless, and runs for days on a small power bank!
+
+---
+
+## 🧩 Supported Boards
+
+| Board | FPGA | Folder | Video | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| Sipeed Tang Nano 9K | Gowin GW1NR-9C | [`fpga/`](fpga/) | HDMI (DVI) 640x480 | original target, 80186 @ 18 MHz |
+| Xilinx Spartan-3A Starter Kit | XC3S700A-4FGG484C | [`fpga_spartan3a/`](fpga_spartan3a/) | VGA 640x480 | 80186 @ 66.7 MHz, 64 MB DDR2, design stored in the on-board SPI flash |
+
+The **ESP32 firmware is identical** for both boards (PS/2 scan code set 2 on GPIO 18/19). On the
+Spartan-3A the FPGA translates set 2 to set 1 internally.
 
 ---
 
@@ -66,6 +81,22 @@ flowchart LR
 ---
 
 ## 📺 Live Hardware Demos & Execution
+
+### 🟩 Spartan-3A Starter Kit
+
+<p align="center">
+  <img src="fpga_spartan3a/assets/spartan3a_board.jpg" width="60%" alt="Spartan-3A Starter Kit with the ESP32 keyboard and the microSD module" />
+</p>
+<p align="center">
+  <img src="fpga_spartan3a/assets/spartan3a_tetris_demo.gif" width="49%" alt="Tetris on the Spartan-3A" />
+  <img src="fpga_spartan3a/assets/spartan3a_prince_of_persia_demo.gif" width="49%" alt="Prince of Persia on the Spartan-3A" />
+</p>
+
+FreeDOS 1.3 boots from a 16 GB SDHC card, the design is stored permanently in the on-board SPI
+flash, and Tetris and Prince of Persia run with the NanoLink86 keyboard. Details, wiring and the
+list of changes: [`fpga_spartan3a/README.md`](fpga_spartan3a/README.md).
+
+### 🟨 Tang Nano 9K
 
 <p align="center">
   <img src="assets/demo_bios_boot.png" width="32%" alt="Next186 BIOS Boot Screen on Tang Nano 9K" />
@@ -145,6 +176,14 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
    * Replaced the unstable BL702 onboard debugger keyboard bridge with dedicated native PS/2 routing (`ps2_kb_clk` on Pin 18/25, `ps2_kb_dat` on Pin 19/26).
    * Developed the ESP32 12.5 kHz native Xtensa Viper PS/2 bit-bang engine.
    * Built the zero-latency, multi-mode Web Controller for GitHub Pages with Web Serial and Web Bluetooth.
+5. **Spartan-3A Starter Kit port**:
+   * Based on **tmatsuya** ([tmatsuya/next186_soc_pc](https://github.com/tmatsuya/next186_soc_pc),
+     Next186 SoC PC for the Spartan-3AN Starter Kit, commit `d59aa2b`), which is the Next186 of
+     Nicolae Dumitrache.
+   * NanoLink86 changes: BIOS inside the FPGA, a bug fix in `ddr_186.v` (line 440), hardware SPI
+     for the SD card, scan code set 2 to set 1 translation for the ESP32 keyboard, new pin
+     assignments and permanent configuration in the SPI flash.
+     See [`fpga_spartan3a/docs/DIFF_VS_UPSTREAM.md`](fpga_spartan3a/docs/DIFF_VS_UPSTREAM.md).
 
 ---
 
@@ -158,6 +197,12 @@ Designed and debugged by **Tslrs** (Hardware & Architecture) collaborating with 
   To solve keyboard timing issues without expensive lab tools, we plugged the Tang Nano 9K HDMI output into a budget **DM-HF200 USB Video Capture Card**. Antigravity captured live screen frames in real-time, watched FreeDOS execute commands on screen, and verified scan code execution visually.
 * **3. Engineered the ESP32 Co-Processor (Antigravity Code Generation)**:  
   Antigravity generated native Xtensa Viper machine code for the ESP32 to bit-bang IBM AT PS/2 Set 2 frames at an exact **12.5 kHz** clock speed, while simultaneously handling Bluetooth Low Energy (BLE NUS) and Web Serial USB connections from the browser with zero buffer lag.
+* **4. Spartan-3A port (Claude + capture-card loop)**:
+  The Spartan-3A version was debugged the same way with **Claude** (Anthropic): the board's VGA
+  output goes into a USB capture card, Claude reads the captured frames with OpenCV, writes small
+  x86 test programs that print memory-test results and SD card responses on the screen, patches
+  them into the bitstream, flashes the board over JTAG and checks the next frame. This found the
+  `bios_cs_d` bug in `ddr_186.v` and a wrong BIOS patch for the SD card.
 
 ---
 
@@ -302,6 +347,13 @@ NanoLink86/
 │   ├── hardware_breadboard_wiring.jpg # Live physical breadboard laboratory testbed photograph
 │   ├── tang_nano_9k_board.png      # High-resolution physical Tang Nano 9K board photograph
 │   └── card_*.png                  # Individual high-resolution MicroSD card assets
+├── fpga_spartan3a/                 # Spartan-3A Starter Kit port (Verilog, BIOS, bitstreams, docs)
+│   ├── src/                        #   ISE 14.7 project and sources
+│   ├── bios/                       #   original + patched BIOS, patch script
+│   ├── bitstreams/                 #   .bit and SPI flash .mcs
+│   ├── tools/                      #   ws_type.py, rec.py, cap.py
+│   ├── docs/                       #   DIFF_VS_UPSTREAM.md and patches
+│   └── assets/                     #   photo, screenshots, GIFs, videos
 ├── fpga/
 │   ├── Next186_S.fs                # Ready-to-flash compiled FPGA bitstream (3.55 MB)
 │   ├── Next186_S.gprj              # Gowin EDA complete project file
