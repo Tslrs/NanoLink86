@@ -1,140 +1,136 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" width="100%" height="100%">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b0f17"/>
-      <stop offset="100%" stop-color="#151b23"/>
+    <linearGradient id="cardFpga" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111927"/>
+      <stop offset="100%" stop-color="#0a0f18"/>
     </linearGradient>
-    <linearGradient id="fpgaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#141e2e"/>
-      <stop offset="100%" stop-color="#0d1520"/>
+    <linearGradient id="cardEsp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a142e"/>
+      <stop offset="100%" stop-color="#0f0b1c"/>
     </linearGradient>
-    <linearGradient id="espGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1f1838"/>
-      <stop offset="100%" stop-color="#120e24"/>
+    <linearGradient id="cardWeb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c231a"/>
+      <stop offset="100%" stop-color="#06140f"/>
     </linearGradient>
-    <linearGradient id="webGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a261d"/>
-      <stop offset="100%" stop-color="#051712"/>
-    </linearGradient>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff"/>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3fb950"/>
     </marker>
-    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#bc8cff"/>
     </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3fb950"/>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff"/>
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect width="1100" height="500" fill="url(#bg)" rx="16" stroke="#30363d" stroke-width="1.5"/>
+  <!-- Canvas Background -->
+  <rect width="1000" height="360" fill="#0d1117" rx="14" stroke="#30363d" stroke-width="1.5"/>
 
-  <!-- Title -->
-  <text x="550" y="45" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle" letter-spacing="0.5">
+  <!-- Main Title -->
+  <text x="500" y="42" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" text-anchor="middle" letter-spacing="0.5">
     NanoLink86 · System Architecture
-  </text>
-  <text x="550" y="70" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" text-anchor="middle">
-    Hardware/Software Co-Design: 16-Bit x86 SoC on FPGA with ESP32 Keyboard Co-Processor &amp; Web Interface
   </text>
 
   <!-- ================= BLOCK 1: FPGA SoC ================= -->
-  <rect x="40" y="105" width="370" height="355" rx="12" fill="url(#fpgaGrad)" stroke="#388bfd" stroke-width="1.5"/>
-  <rect x="55" y="120" width="340" height="34" rx="6" fill="#1c2d42" stroke="#58a6ff" stroke-width="1"/>
-  <text x="225" y="142" fill="#58a6ff" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
-    FPGA SoC (Tang Nano 9K / Spartan-3A)
+  <rect x="40" y="75" width="310" height="245" rx="10" fill="url(#cardFpga)" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="195" y="108" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" text-anchor="middle">
+    FPGA SoC
+  </text>
+  <text x="195" y="128" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    Tang Nano 9K / Spartan-3A
   </text>
 
-  <!-- CPU -->
-  <rect x="60" y="170" width="330" height="55" rx="6" fill="#0d1117" stroke="#388bfd" stroke-width="1"/>
-  <text x="75" y="195" fill="#58a6ff" font-family="sans-serif" font-size="14" font-weight="700">Next186 CPU Soft-Core</text>
-  <text x="75" y="214" fill="#8b949e" font-family="sans-serif" font-size="11">80186-compatible CPU (Real Mode x86)</text>
-
-  <!-- Submodules Grid -->
-  <!-- Memory -->
-  <rect x="60" y="235" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="72" y="258" fill="#79c0ff" font-family="sans-serif" font-size="12" font-weight="700">System Memory</text>
-  <text x="72" y="278" fill="#8b949e" font-family="sans-serif" font-size="10.5">PSRAM / DDR2 + Cache</text>
-
-  <!-- Video -->
-  <rect x="235" y="235" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="247" y="258" fill="#d2a8ff" font-family="sans-serif" font-size="12" font-weight="700">Video Output</text>
-  <text x="247" y="278" fill="#8b949e" font-family="sans-serif" font-size="10.5">VGA / HDMI (640x480)</text>
-
-  <!-- Storage -->
-  <rect x="60" y="303" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="72" y="326" fill="#ffa657" font-family="sans-serif" font-size="12" font-weight="700">MicroSD Storage</text>
-  <text x="72" y="346" fill="#8b949e" font-family="sans-serif" font-size="10.5">SPI Master (Drive C: FAT16)</text>
-
-  <!-- Keyboard Controller -->
-  <rect x="235" y="303" width="155" height="58" rx="6" fill="#0d1117" stroke="#f43f5e" stroke-width="1"/>
-  <text x="247" y="326" fill="#ff7b72" font-family="sans-serif" font-size="12" font-weight="700">8042 PS/2 Controller</text>
-  <text x="247" y="346" fill="#8b949e" font-family="sans-serif" font-size="10.5">Keyboard Receiver (Set 1/2)</text>
-
-  <!-- OS Status Banner -->
-  <rect x="60" y="375" width="330" height="65" rx="6" fill="#0d1117" stroke="#238636" stroke-width="1"/>
-  <text x="225" y="401" fill="#3fb950" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle">
-    FreeDOS 1.3 Operating System
-  </text>
-  <text x="225" y="423" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">
-    Boots from MicroSD · Runs DOS Games &amp; Apps
+  <!-- Inner items inside FPGA -->
+  <rect x="60" y="145" width="270" height="34" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="195" y="167" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600" text-anchor="middle">
+    Next186 CPU (80186 PC-Compatible)
   </text>
 
-  <!-- ================= BLOCK 2: ESP32 CO-PROCESSOR ================= -->
-  <rect x="445" y="105" width="300" height="355" rx="12" fill="url(#espGrad)" stroke="#bc8cff" stroke-width="1.5"/>
-  <rect x="460" y="120" width="270" height="34" rx="6" fill="#2d2250" stroke="#d2a8ff" stroke-width="1"/>
-  <text x="595" y="142" fill="#d2a8ff" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+  <rect x="60" y="188" width="130" height="32" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="125" y="209" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    RAM (PSRAM/DDR2)
+  </text>
+
+  <rect x="200" y="188" width="130" height="32" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="265" y="209" fill="#d2a8ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    Video (VGA/HDMI)
+  </text>
+
+  <rect x="60" y="228" width="130" height="32" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="125" y="249" fill="#ffa657" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    MicroSD (Drive C:)
+  </text>
+
+  <rect x="200" y="228" width="130" height="32" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="265" y="249" fill="#ff7b72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    8042 Keyboard
+  </text>
+
+  <!-- OS Badge -->
+  <rect x="60" y="268" width="270" height="36" rx="6" fill="#1f2d24" stroke="#2ea043" stroke-width="1"/>
+  <text x="195" y="291" fill="#3fb950" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+    FreeDOS 1.3
+  </text>
+
+  <!-- ================= BLOCK 2: ESP32 ================= -->
+  <rect x="400" y="75" width="240" height="245" rx="10" fill="url(#cardEsp)" stroke="#bc8cff" stroke-width="1.5"/>
+  <text x="520" y="108" fill="#d2a8ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" text-anchor="middle">
     ESP32 Co-Processor
   </text>
-
-  <!-- Viper Bit-Bang Engine -->
-  <rect x="465" y="170" width="260" height="110" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1"/>
-  <text x="480" y="198" fill="#d2a8ff" font-family="sans-serif" font-size="13.5" font-weight="700">PS/2 Bit-Bang Engine</text>
-  <text x="480" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">• MicroPython Viper machine code</text>
-  <text x="480" y="244" fill="#8b949e" font-family="sans-serif" font-size="11">• 12.5 kHz PS/2 clock (GPIO 18)</text>
-  <text x="480" y="266" fill="#8b949e" font-family="sans-serif" font-size="11">• Scan Code Set 2 serial data (GPIO 19)</text>
-
-  <!-- Bridge & Comm -->
-  <rect x="465" y="295" width="260" height="145" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="480" y="323" fill="#7ee787" font-family="sans-serif" font-size="13.5" font-weight="700">Wireless &amp; Serial Bridge</text>
-  <text x="480" y="348" fill="#8b949e" font-family="sans-serif" font-size="11">• Web Serial API (USB-UART 115200)</text>
-  <text x="480" y="370" fill="#8b949e" font-family="sans-serif" font-size="11">• Bluetooth Low Energy (BLE NUS)</text>
-  <text x="480" y="392" fill="#8b949e" font-family="sans-serif" font-size="11">• Wi-Fi Telemetry &amp; Captive Portal</text>
-  <text x="480" y="418" fill="#3fb950" font-family="sans-serif" font-size="11" font-weight="600">Zero host software required</text>
-
-  <!-- ================= BLOCK 3: WEB CONTROLLER ================= -->
-  <rect x="780" y="105" width="280" height="355" rx="12" fill="url(#webGrad)" stroke="#2ea043" stroke-width="1.5"/>
-  <rect x="795" y="120" width="250" height="34" rx="6" fill="#133d26" stroke="#3fb950" stroke-width="1"/>
-  <text x="920" y="142" fill="#3fb950" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
-    Web Controller (Client)
+  <text x="520" y="128" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    NanoLink86 Keyboard Controller
   </text>
 
-  <!-- Browser App -->
-  <rect x="795" y="170" width="250" height="110" rx="6" fill="#0d1117" stroke="#2ea043" stroke-width="1"/>
-  <text x="810" y="198" fill="#3fb950" font-family="sans-serif" font-size="13.5" font-weight="700">Static Web App</text>
-  <text x="810" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">• Runs directly in modern browsers</text>
-  <text x="810" y="244" fill="#8b949e" font-family="sans-serif" font-size="11">• Chrome, Edge, Safari, Bluefy (iOS)</text>
-  <text x="810" y="266" fill="#8b949e" font-family="sans-serif" font-size="11">• Hosted on GitHub Pages</text>
+  <rect x="420" y="150" width="200" height="65" rx="6" fill="#161b22" stroke="#bc8cff" stroke-width="1"/>
+  <text x="520" y="177" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    PS/2 Bit-Bang Engine
+  </text>
+  <text x="520" y="199" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" text-anchor="middle">
+    MicroPython Viper (12.5 kHz)
+  </text>
 
-  <!-- Keystroke Translation -->
-  <rect x="795" y="295" width="250" height="145" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="810" y="323" fill="#79c0ff" font-family="sans-serif" font-size="13.5" font-weight="700">Keyboard Translation</text>
-  <text x="810" y="348" fill="#8b949e" font-family="sans-serif" font-size="11">• Real-time keydown/keyup events</text>
-  <text x="810" y="370" fill="#8b949e" font-family="sans-serif" font-size="11">• IBM AT Make/Break code generation</text>
-  <text x="810" y="392" fill="#8b949e" font-family="sans-serif" font-size="11">• Last.fm / Spotify telemetry stream</text>
-  <text x="810" y="418" fill="#8b949e" font-family="sans-serif" font-size="11">• Ultra-low latency input arena</text>
+  <rect x="420" y="230" width="200" height="65" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="520" y="257" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    Communication Bridge
+  </text>
+  <text x="520" y="279" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" text-anchor="middle">
+    Web Serial · BLE · Wi-Fi
+  </text>
 
-  <!-- ================= ARROWS / BUSES ================= -->
-  <!-- Web to ESP32 (Bidirectional) -->
-  <line x1="780" y1="280" x2="745" y2="280" stroke="#3fb950" stroke-width="2.5" marker-end="url(#arrow-green)"/>
-  <line x1="745" y1="285" x2="780" y2="285" stroke="#bc8cff" stroke-width="2.5" marker-end="url(#arrow-purple)"/>
-  <rect x="746" y="247" width="34" height="20" rx="3" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="763" y="261" fill="#7ee787" font-family="sans-serif" font-size="9.5" font-weight="700" text-anchor="middle">USB/BLE</text>
+  <!-- ================= BLOCK 3: WEB CONTROLLER ================= -->
+  <rect x="690" y="75" width="270" height="245" rx="10" fill="url(#cardWeb)" stroke="#2ea043" stroke-width="1.5"/>
+  <text x="825" y="108" fill="#3fb950" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" text-anchor="middle">
+    Web Controller
+  </text>
+  <text x="825" y="128" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" text-anchor="middle">
+    Browser User Interface
+  </text>
 
-  <!-- ESP32 to FPGA (PS/2) -->
-  <line x1="445" y1="332" x2="410" y2="332" stroke="#f43f5e" stroke-width="2.5" marker-end="url(#arrow-purple)"/>
-  <rect x="408" y="297" width="40" height="24" rx="3" fill="#161b22" stroke="#f43f5e" stroke-width="1"/>
-  <text x="428" y="309" fill="#ff7b72" font-family="sans-serif" font-size="8.5" font-weight="700" text-anchor="middle">PS/2 BUS</text>
-  <text x="428" y="318" fill="#8b949e" font-family="sans-serif" font-size="7.5" text-anchor="middle">12.5 kHz</text>
+  <rect x="710" y="150" width="230" height="65" rx="6" fill="#161b22" stroke="#2ea043" stroke-width="1"/>
+  <text x="825" y="177" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    Web Serial &amp; Bluetooth App
+  </text>
+  <text x="825" y="199" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" text-anchor="middle">
+    Runs on GitHub Pages (No install)
+  </text>
+
+  <rect x="710" y="230" width="230" height="65" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="825" y="257" fill="#79c0ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    Keystrokes &amp; Telemetry
+  </text>
+  <text x="825" y="279" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" text-anchor="middle">
+    IBM AT Scancodes + Last.fm
+  </text>
+
+  <!-- ================= BUSES & CONNECTIONS ================= -->
+  <!-- Web to ESP32 -->
+  <line x1="690" y1="195" x2="646" y2="195" stroke="#3fb950" stroke-width="2" marker-end="url(#arr-green)"/>
+  <rect x="646" y="175" width="40" height="18" rx="3" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="666" y="188" fill="#7ee787" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" text-anchor="middle">USB/BLE</text>
+
+  <!-- ESP32 to FPGA -->
+  <line x1="400" y1="195" x2="356" y2="195" stroke="#f43f5e" stroke-width="2" marker-end="url(#arr-purple)"/>
+  <rect x="355" y="175" width="42" height="18" rx="3" fill="#161b22" stroke="#f43f5e" stroke-width="1"/>
+  <text x="376" y="188" fill="#ff7b72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" text-anchor="middle">PS/2</text>
 
 </svg>
