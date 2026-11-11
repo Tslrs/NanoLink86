@@ -39,7 +39,7 @@ Spartan-3A the FPGA translates set 2 to set 1 internally.
 The complete hardware/software co-design bridges classic 16-bit x86 architecture with modern zero-latency web and wireless control:
 
 <p align="center">
-  <img src="assets/system_architecture.svg" width="100%" alt="NanoLink86 System Architecture: FPGA SoC (Tang Nano 9K / Spartan-3A), ESP32 Viper Engine & Web Controller" />
+  <img src="assets/system_architecture.svg?v=3" width="100%" alt="NanoLink86 System Architecture: FPGA SoC (Tang Nano 9K / Spartan-3A), ESP32 Viper Engine & Web Controller" />
 </p>
 
 <details>
