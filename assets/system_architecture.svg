@@ -1,162 +1,140 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" width="100%" height="100%">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0d1117"/>
-      <stop offset="100%" stop-color="#161b22"/>
+      <stop offset="0%" stop-color="#0b0f17"/>
+      <stop offset="100%" stop-color="#151b23"/>
     </linearGradient>
     <linearGradient id="fpgaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1f2937"/>
-      <stop offset="100%" stop-color="#111827"/>
+      <stop offset="0%" stop-color="#141e2e"/>
+      <stop offset="100%" stop-color="#0d1520"/>
     </linearGradient>
     <linearGradient id="espGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e1b4b"/>
-      <stop offset="100%" stop-color="#0f172a"/>
+      <stop offset="0%" stop-color="#1f1838"/>
+      <stop offset="100%" stop-color="#120e24"/>
     </linearGradient>
     <linearGradient id="webGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#064e3b"/>
-      <stop offset="100%" stop-color="#022c22"/>
+      <stop offset="0%" stop-color="#0a261d"/>
+      <stop offset="100%" stop-color="#051712"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#bc8cff"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3fb950"/>
+    </marker>
   </defs>
 
   <!-- Background -->
-  <rect width="1200" height="640" fill="url(#bg)" rx="16" stroke="#30363d" stroke-width="2"/>
+  <rect width="1100" height="500" fill="url(#bg)" rx="16" stroke="#30363d" stroke-width="1.5"/>
 
-  <!-- Title & Subtitle -->
-  <text x="600" y="46" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" text-anchor="middle" letter-spacing="1">
-    NANOLINK86 SYSTEM ARCHITECTURE
+  <!-- Title -->
+  <text x="550" y="45" fill="#f0f6fc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle" letter-spacing="0.5">
+    NanoLink86 · System Architecture
   </text>
-  <text x="600" y="74" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" text-anchor="middle">
-    Hardware/Software Co-Design: 16-Bit x86 SoC on Gowin FPGA with ESP32 Xtensa Viper Co-Processor &amp; Web Bridge
-  </text>
-
-  <!-- ================= SECTION 1: TANG NANO 9K FPGA ================= -->
-  <rect x="40" y="110" width="460" height="490" rx="12" fill="url(#fpgaGrad)" stroke="#388bfd" stroke-width="2"/>
-  <rect x="55" y="125" width="430" height="36" rx="6" fill="#1e293b" stroke="#388bfd" stroke-width="1"/>
-  <text x="270" y="149" fill="#58a6ff" font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle">
-    TANG NANO 9K (GOWIN GW1NR-9C FPGA)
+  <text x="550" y="70" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" text-anchor="middle">
+    Hardware/Software Co-Design: 16-Bit x86 SoC on FPGA with ESP32 Keyboard Co-Processor &amp; Web Interface
   </text>
 
-  <!-- CPU Box -->
-  <rect x="65" y="180" width="410" height="80" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="80" y="208" fill="#58a6ff" font-family="sans-serif" font-size="16" font-weight="700">Next186 CPU Soft-Core (80186 @ 18 MHz)</text>
-  <text x="80" y="230" fill="#c9d1d9" font-family="sans-serif" font-size="12">• 18 MIPS Processing Core (ALU, BIU, Registers, 32-bit Internal Bus)</text>
-  <text x="80" y="248" fill="#8b949e" font-family="sans-serif" font-size="11">• 6,992 / 8,640 LUTs (81% FPGA Utilization) · Zero L1 Cache for Fit</text>
-
-  <!-- Memory Box -->
-  <rect x="65" y="275" width="195" height="95" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="78" y="300" fill="#79c0ff" font-family="sans-serif" font-size="13" font-weight="700">64 Mbit PSRAM</text>
-  <text x="78" y="322" fill="#8b949e" font-family="sans-serif" font-size="11">Embedded Cache Interface</text>
-  <text x="78" y="340" fill="#8b949e" font-family="sans-serif" font-size="11">72 MHz 16-bit DDR</text>
-  <text x="78" y="358" fill="#3fb950" font-family="sans-serif" font-size="11" font-weight="600">86 mW Low Power</text>
-
-  <!-- Video Box -->
-  <rect x="280" y="275" width="195" height="95" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="293" y="300" fill="#d2a8ff" font-family="sans-serif" font-size="13" font-weight="700">DVI TX HDMI</text>
-  <text x="293" y="322" fill="#8b949e" font-family="sans-serif" font-size="11">640x480 @ 60 Hz VGA</text>
-  <text x="293" y="340" fill="#8b949e" font-family="sans-serif" font-size="11">Differential TMDS PHY</text>
-  <text x="293" y="358" fill="#d2a8ff" font-family="sans-serif" font-size="11" font-weight="600">Direct Display Out</text>
-
-  <!-- Storage Box -->
-  <rect x="65" y="385" width="195" height="95" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="78" y="410" fill="#ffa657" font-family="sans-serif" font-size="13" font-weight="700">SPI MicroSD Controller</text>
-  <text x="78" y="432" fill="#8b949e" font-family="sans-serif" font-size="11">Drive C: Emulation (FAT16)</text>
-  <text x="78" y="450" fill="#8b949e" font-family="sans-serif" font-size="11">FreeDOS 1.3 Kernel Boot</text>
-  <text x="78" y="468" fill="#ffa657" font-family="sans-serif" font-size="11" font-weight="600">INT 13h BIOS Driver</text>
-
-  <!-- Keyboard Controller Box -->
-  <rect x="280" y="385" width="195" height="95" rx="8" fill="#0d1117" stroke="#f43f5e" stroke-width="1.5"/>
-  <text x="293" y="410" fill="#ff7b72" font-family="sans-serif" font-size="13" font-weight="700">Intel 8042 Controller</text>
-  <text x="293" y="432" fill="#8b949e" font-family="sans-serif" font-size="11">Hardware PS/2 Receiver</text>
-  <text x="293" y="450" fill="#8b949e" font-family="sans-serif" font-size="11">Pin 18 (CLK) &amp; Pin 19 (DAT)</text>
-  <text x="293" y="468" fill="#ff7b72" font-family="sans-serif" font-size="11" font-weight="600">IBM AT Scan Code Set 2</text>
-
-  <!-- Boot ROM Note -->
-  <rect x="65" y="495" width="410" height="85" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="80" y="520" fill="#e6edf3" font-family="sans-serif" font-size="12" font-weight="700">Next186 Chameleon PC BIOS &amp; Bootloader</text>
-  <text x="80" y="540" fill="#8b949e" font-family="sans-serif" font-size="11">• Embedded ROM BIOS (BIOS_Next186.asm) handles MBR execution at 0x7C00</text>
-  <text x="80" y="558" fill="#8b949e" font-family="sans-serif" font-size="11">• Gowin EDA V1.9.12 verified bitstream: Next186_S.fs (3.55 MB permanently in SPI Flash)</text>
-
-  <!-- ================= SECTION 2: ESP32 CO-PROCESSOR ================= -->
-  <rect x="540" y="110" width="320" height="490" rx="12" fill="url(#espGrad)" stroke="#bc8cff" stroke-width="2"/>
-  <rect x="555" y="125" width="290" height="36" rx="6" fill="#1e1b4b" stroke="#bc8cff" stroke-width="1"/>
-  <text x="700" y="149" fill="#d2a8ff" font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle">
-    ESP32 HARDWARE CO-PROCESSOR
+  <!-- ================= BLOCK 1: FPGA SoC ================= -->
+  <rect x="40" y="105" width="370" height="355" rx="12" fill="url(#fpgaGrad)" stroke="#388bfd" stroke-width="1.5"/>
+  <rect x="55" y="120" width="340" height="34" rx="6" fill="#1c2d42" stroke="#58a6ff" stroke-width="1"/>
+  <text x="225" y="142" fill="#58a6ff" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+    FPGA SoC (Tang Nano 9K / Spartan-3A)
   </text>
 
-  <!-- Viper Bit-Banger -->
-  <rect x="555" y="180" width="290" height="125" rx="8" fill="#0d1117" stroke="#bc8cff" stroke-width="1.5"/>
-  <text x="570" y="208" fill="#d2a8ff" font-family="sans-serif" font-size="15" font-weight="700">Xtensa Viper PS/2 Engine</text>
-  <text x="570" y="230" fill="#3fb950" font-family="sans-serif" font-size="12" font-weight="600">Exact 12.5 kHz PS/2 Clock (40μs Period)</text>
-  <text x="570" y="252" fill="#8b949e" font-family="sans-serif" font-size="11">• Native Machine Code (@micropython.viper)</text>
-  <text x="570" y="270" fill="#8b949e" font-family="sans-serif" font-size="11">• Direct 32-bit GPIO register writes (0x3FF44008)</text>
-  <text x="570" y="288" fill="#8b949e" font-family="sans-serif" font-size="11">• Calibrated loop (delay_cnt=220) - 0 jitter!</text>
+  <!-- CPU -->
+  <rect x="60" y="170" width="330" height="55" rx="6" fill="#0d1117" stroke="#388bfd" stroke-width="1"/>
+  <text x="75" y="195" fill="#58a6ff" font-family="sans-serif" font-size="14" font-weight="700">Next186 CPU Soft-Core</text>
+  <text x="75" y="214" fill="#8b949e" font-family="sans-serif" font-size="11">80186-compatible CPU (Real Mode x86)</text>
 
-  <!-- Multi-Mode Bridge -->
-  <rect x="555" y="320" width="290" height="150" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="570" y="348" fill="#7ee787" font-family="sans-serif" font-size="14" font-weight="700">Tri-Mode Communications</text>
-  
-  <text x="570" y="374" fill="#58a6ff" font-family="sans-serif" font-size="12" font-weight="600">1. Web Serial API (USB-UART)</text>
-  <text x="585" y="392" fill="#8b949e" font-family="sans-serif" font-size="11">115200 baud direct hardware stream</text>
+  <!-- Submodules Grid -->
+  <!-- Memory -->
+  <rect x="60" y="235" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="72" y="258" fill="#79c0ff" font-family="sans-serif" font-size="12" font-weight="700">System Memory</text>
+  <text x="72" y="278" fill="#8b949e" font-family="sans-serif" font-size="10.5">PSRAM / DDR2 + Cache</text>
 
-  <text x="570" y="414" fill="#bc8cff" font-family="sans-serif" font-size="12" font-weight="600">2. Bluetooth Low Energy (BLE)</text>
-  <text x="585" y="432" fill="#8b949e" font-family="sans-serif" font-size="11">Nordic UART Service (NUS) wireless link</text>
+  <!-- Video -->
+  <rect x="235" y="235" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="247" y="258" fill="#d2a8ff" font-family="sans-serif" font-size="12" font-weight="700">Video Output</text>
+  <text x="247" y="278" fill="#8b949e" font-family="sans-serif" font-size="10.5">VGA / HDMI (640x480)</text>
 
-  <text x="570" y="454" fill="#ffa657" font-family="sans-serif" font-size="12" font-weight="600">3. Wi-Fi Telemetry &amp; Captive Portal</text>
+  <!-- Storage -->
+  <rect x="60" y="303" width="155" height="58" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="72" y="326" fill="#ffa657" font-family="sans-serif" font-size="12" font-weight="700">MicroSD Storage</text>
+  <text x="72" y="346" fill="#8b949e" font-family="sans-serif" font-size="10.5">SPI Master (Drive C: FAT16)</text>
 
-  <!-- Power Note -->
-  <rect x="555" y="485" width="290" height="95" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="570" y="512" fill="#e6edf3" font-family="sans-serif" font-size="12" font-weight="700">Power &amp; Performance</text>
-  <text x="570" y="534" fill="#8b949e" font-family="sans-serif" font-size="11">• Current: 80 - 110 mA @ 5V (~0.45 W)</text>
-  <text x="570" y="552" fill="#8b949e" font-family="sans-serif" font-size="11">• Total Combined System: &lt; 1.45 Watts</text>
-  <text x="570" y="570" fill="#3fb950" font-family="sans-serif" font-size="11" font-weight="600">• 100% Fanless &amp; Silent Operation</text>
+  <!-- Keyboard Controller -->
+  <rect x="235" y="303" width="155" height="58" rx="6" fill="#0d1117" stroke="#f43f5e" stroke-width="1"/>
+  <text x="247" y="326" fill="#ff7b72" font-family="sans-serif" font-size="12" font-weight="700">8042 PS/2 Controller</text>
+  <text x="247" y="346" fill="#8b949e" font-family="sans-serif" font-size="10.5">Keyboard Receiver (Set 1/2)</text>
 
-  <!-- ================= SECTION 3: CLIENT / WEB CONTROLLER ================= -->
-  <rect x="900" y="110" width="260" height="490" rx="12" fill="url(#webGrad)" stroke="#2ea043" stroke-width="2"/>
-  <rect x="915" y="125" width="230" height="36" rx="6" fill="#064e3b" stroke="#2ea043" stroke-width="1"/>
-  <text x="1030" y="149" fill="#7ee787" font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle">
-    WEB CONTROLLER (CLIENT)
+  <!-- OS Status Banner -->
+  <rect x="60" y="375" width="330" height="65" rx="6" fill="#0d1117" stroke="#238636" stroke-width="1"/>
+  <text x="225" y="401" fill="#3fb950" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+    FreeDOS 1.3 Operating System
+  </text>
+  <text x="225" y="423" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">
+    Boots from MicroSD · Runs DOS Games &amp; Apps
   </text>
 
-  <!-- Zero Install UI -->
-  <rect x="915" y="180" width="230" height="145" rx="8" fill="#0d1117" stroke="#2ea043" stroke-width="1.5"/>
-  <text x="930" y="208" fill="#7ee787" font-family="sans-serif" font-size="14" font-weight="700">Zero-Install Web App</text>
-  <text x="930" y="230" fill="#8b949e" font-family="sans-serif" font-size="11">• Runs on GitHub Pages</text>
-  <text x="930" y="248" fill="#8b949e" font-family="sans-serif" font-size="11">• Chrome / Edge / Safari / Bluefy</text>
-  <text x="930" y="266" fill="#8b949e" font-family="sans-serif" font-size="11">• Authentic CRT themes</text>
-  <text x="930" y="284" fill="#8b949e" font-family="sans-serif" font-size="11">• Real-time typing speed (WPM)</text>
-  <text x="930" y="304" fill="#3fb950" font-family="sans-serif" font-size="11" font-weight="600">tslrs.github.io/NanoLink86</text>
+  <!-- ================= BLOCK 2: ESP32 CO-PROCESSOR ================= -->
+  <rect x="445" y="105" width="300" height="355" rx="12" fill="url(#espGrad)" stroke="#bc8cff" stroke-width="1.5"/>
+  <rect x="460" y="120" width="270" height="34" rx="6" fill="#2d2250" stroke="#d2a8ff" stroke-width="1"/>
+  <text x="595" y="142" fill="#d2a8ff" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+    ESP32 Co-Processor
+  </text>
 
-  <!-- Scancode Engine -->
-  <rect x="915" y="340" width="230" height="130" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
-  <text x="930" y="368" fill="#58a6ff" font-family="sans-serif" font-size="13" font-weight="700">Scancode Translation</text>
-  <text x="930" y="390" fill="#8b949e" font-family="sans-serif" font-size="11">• JavaScript key event listener</text>
-  <text x="930" y="408" fill="#8b949e" font-family="sans-serif" font-size="11">• Generates IBM AT Make/Break</text>
-  <text x="930" y="426" fill="#8b949e" font-family="sans-serif" font-size="11">• Handles Shift, Ctrl, Alt, F1-F12</text>
-  <text x="930" y="444" fill="#8b949e" font-family="sans-serif" font-size="11">• Direct scan code inject</text>
+  <!-- Viper Bit-Bang Engine -->
+  <rect x="465" y="170" width="260" height="110" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1"/>
+  <text x="480" y="198" fill="#d2a8ff" font-family="sans-serif" font-size="13.5" font-weight="700">PS/2 Bit-Bang Engine</text>
+  <text x="480" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">• MicroPython Viper machine code</text>
+  <text x="480" y="244" fill="#8b949e" font-family="sans-serif" font-size="11">• 12.5 kHz PS/2 clock (GPIO 18)</text>
+  <text x="480" y="266" fill="#8b949e" font-family="sans-serif" font-size="11">• Scan Code Set 2 serial data (GPIO 19)</text>
 
-  <!-- Relay Server -->
-  <rect x="915" y="485" width="230" height="95" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="930" y="512" fill="#e6edf3" font-family="sans-serif" font-size="12" font-weight="700">macOS launchd Daemon</text>
-  <text x="930" y="534" fill="#8b949e" font-family="sans-serif" font-size="11">• WebSocket relay (port 8088)</text>
-  <text x="930" y="552" fill="#8b949e" font-family="sans-serif" font-size="11">• TCP bridge (port 8089)</text>
-  <text x="930" y="570" fill="#7ee787" font-family="sans-serif" font-size="11" font-weight="600">• Audit history dashboard</text>
+  <!-- Bridge & Comm -->
+  <rect x="465" y="295" width="260" height="145" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="480" y="323" fill="#7ee787" font-family="sans-serif" font-size="13.5" font-weight="700">Wireless &amp; Serial Bridge</text>
+  <text x="480" y="348" fill="#8b949e" font-family="sans-serif" font-size="11">• Web Serial API (USB-UART 115200)</text>
+  <text x="480" y="370" fill="#8b949e" font-family="sans-serif" font-size="11">• Bluetooth Low Energy (BLE NUS)</text>
+  <text x="480" y="392" fill="#8b949e" font-family="sans-serif" font-size="11">• Wi-Fi Telemetry &amp; Captive Portal</text>
+  <text x="480" y="418" fill="#3fb950" font-family="sans-serif" font-size="11" font-weight="600">Zero host software required</text>
 
-  <!-- ================= BUS CONNECTORS / ARROWS ================= -->
-  <!-- Wire: ESP32 to Tang Nano (PS/2) -->
-  <path d="M 555 240 L 500 240 L 500 432 L 475 432" fill="none" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6,3" filter="url(#glow)"/>
-  <polygon points="475,432 485,427 485,437" fill="#f43f5e"/>
-  <rect x="480" y="325" width="80" height="36" rx="4" fill="#0d1117" stroke="#f43f5e" stroke-width="1"/>
-  <text x="520" y="340" fill="#ff7b72" font-family="sans-serif" font-size="10" font-weight="700" text-anchor="middle">PS/2 BUS</text>
-  <text x="520" y="353" fill="#ff7b72" font-family="sans-serif" font-size="9" text-anchor="middle">12.5 kHz / 40μs</text>
+  <!-- ================= BLOCK 3: WEB CONTROLLER ================= -->
+  <rect x="780" y="105" width="280" height="355" rx="12" fill="url(#webGrad)" stroke="#2ea043" stroke-width="1.5"/>
+  <rect x="795" y="120" width="250" height="34" rx="6" fill="#133d26" stroke="#3fb950" stroke-width="1"/>
+  <text x="920" y="142" fill="#3fb950" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+    Web Controller (Client)
+  </text>
 
-  <!-- Wire: Web to ESP32 (Serial / BLE) -->
-  <path d="M 915 250 L 860 250 L 860 380 L 845 380" fill="none" stroke="#58a6ff" stroke-width="3" filter="url(#glow)"/>
-  <polygon points="845,380 855,375 855,385" fill="#58a6ff"/>
-  <rect x="842" y="295" width="86" height="36" rx="4" fill="#0d1117" stroke="#58a6ff" stroke-width="1"/>
-  <text x="885" y="310" fill="#79c0ff" font-family="sans-serif" font-size="10" font-weight="700" text-anchor="middle">USB / BLE</text>
-  <text x="885" y="323" fill="#79c0ff" font-family="sans-serif" font-size="9" text-anchor="middle">Zero Buffer Lag</text>
+  <!-- Browser App -->
+  <rect x="795" y="170" width="250" height="110" rx="6" fill="#0d1117" stroke="#2ea043" stroke-width="1"/>
+  <text x="810" y="198" fill="#3fb950" font-family="sans-serif" font-size="13.5" font-weight="700">Static Web App</text>
+  <text x="810" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">• Runs directly in modern browsers</text>
+  <text x="810" y="244" fill="#8b949e" font-family="sans-serif" font-size="11">• Chrome, Edge, Safari, Bluefy (iOS)</text>
+  <text x="810" y="266" fill="#8b949e" font-family="sans-serif" font-size="11">• Hosted on GitHub Pages</text>
+
+  <!-- Keystroke Translation -->
+  <rect x="795" y="295" width="250" height="145" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="810" y="323" fill="#79c0ff" font-family="sans-serif" font-size="13.5" font-weight="700">Keyboard Translation</text>
+  <text x="810" y="348" fill="#8b949e" font-family="sans-serif" font-size="11">• Real-time keydown/keyup events</text>
+  <text x="810" y="370" fill="#8b949e" font-family="sans-serif" font-size="11">• IBM AT Make/Break code generation</text>
+  <text x="810" y="392" fill="#8b949e" font-family="sans-serif" font-size="11">• Last.fm / Spotify telemetry stream</text>
+  <text x="810" y="418" fill="#8b949e" font-family="sans-serif" font-size="11">• Ultra-low latency input arena</text>
+
+  <!-- ================= ARROWS / BUSES ================= -->
+  <!-- Web to ESP32 (Bidirectional) -->
+  <line x1="780" y1="280" x2="745" y2="280" stroke="#3fb950" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+  <line x1="745" y1="285" x2="780" y2="285" stroke="#bc8cff" stroke-width="2.5" marker-end="url(#arrow-purple)"/>
+  <rect x="746" y="247" width="34" height="20" rx="3" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="763" y="261" fill="#7ee787" font-family="sans-serif" font-size="9.5" font-weight="700" text-anchor="middle">USB/BLE</text>
+
+  <!-- ESP32 to FPGA (PS/2) -->
+  <line x1="445" y1="332" x2="410" y2="332" stroke="#f43f5e" stroke-width="2.5" marker-end="url(#arrow-purple)"/>
+  <rect x="408" y="297" width="40" height="24" rx="3" fill="#161b22" stroke="#f43f5e" stroke-width="1"/>
+  <text x="428" y="309" fill="#ff7b72" font-family="sans-serif" font-size="8.5" font-weight="700" text-anchor="middle">PS/2 BUS</text>
+  <text x="428" y="318" fill="#8b949e" font-family="sans-serif" font-size="7.5" text-anchor="middle">12.5 kHz</text>
+
 </svg>

@@ -39,7 +39,7 @@ Spartan-3A the FPGA translates set 2 to set 1 internally.
 The complete hardware/software co-design bridges classic 16-bit x86 architecture with modern zero-latency web and wireless control:
 
 <p align="center">
-  <img src="assets/system_architecture.svg" width="100%" alt="NanoLink86 System Architecture: Tang Nano 9K FPGA SoC, ESP32 Viper Engine & Web Controller" />
+  <img src="assets/system_architecture.svg" width="100%" alt="NanoLink86 System Architecture: FPGA SoC (Tang Nano 9K / Spartan-3A), ESP32 Viper Engine & Web Controller" />
 </p>
 
 <details>
@@ -47,33 +47,29 @@ The complete hardware/software co-design bridges classic 16-bit x86 architecture
 
 ```mermaid
 flowchart LR
-    subgraph FPGA ["Tang Nano 9K (Gowin GW1NR-9C)"]
-        CPU["Next186 CPU Core<br/>(80186 @ 18 MHz)"]
-        RAM["64 Mbit PSRAM<br/>Cache Interface"]
-        VGA["DVI TX HDMI<br/>(640x480 @ 60Hz)"]
-        SPI["SPI Master Host<br/>(TF MicroSD Drive C:)"]
-        KBD["Intel 8042 PS/2<br/>Keyboard Controller"]
-        
-        CPU <--> RAM
-        CPU --> VGA
-        CPU <--> SPI
+    subgraph CLIENT ["Web Controller (Client)"]
+        WEB["Browser Interface<br/>(Web Serial / BLE / Wi-Fi)"]
+    end
+
+    subgraph ESP ["ESP32 Co-Processor"]
+        VIPER["PS/2 Bit-Bang Engine<br/>(Xtensa Viper Machine Code)"]
+    end
+
+    subgraph FPGA ["FPGA SoC (Tang Nano 9K / Spartan-3A)"]
+        KBD["8042 PS/2 Controller"]
+        CPU["Next186 CPU Core<br/>(80186 Real Mode x86)"]
+        MEM["Memory & Cache<br/>(PSRAM / DDR2)"]
+        VGA["Video Display<br/>(HDMI / VGA 640x480)"]
+        SD["MicroSD Storage<br/>(Drive C: FreeDOS 1.3)"]
+
         KBD --> CPU
+        CPU <--> MEM
+        CPU --> VGA
+        CPU <--> SD
     end
 
-    subgraph ESP ["ESP32 Hardware Co-Processor"]
-        VIPER["Xtensa Viper Engine<br/>(@micropython.viper)"]
-        COMMS["Dual Link Controller<br/>(WebSerial & BLE NUS)"]
-        VIPER <--> COMMS
-    end
-
-    subgraph CLIENT ["Client Interface"]
-        UI["Zero-Install Web Controller<br/>(Chrome / Safari / Bluefy)"]
-    end
-
-    VIPER -- "PS/2 Clock (12.5 kHz)<br/>PS/2 Data (Set 2)" --> KBD
-    UI -- "Web Serial (USB @ 115200)<br/>Web Bluetooth (BLE)" --> COMMS
-    VGA -- "Digital Video Out" --> DISP["HDMI Monitor / TV"]
-    SPI -- "FAT16 Raw Sectors" --> SD["MicroSD Card (128MB)"]
+    WEB -- "USB / Bluetooth" --> VIPER
+    VIPER -- "PS/2 Bus (12.5 kHz)" --> KBD
 ```
 
 </details>
