@@ -50,26 +50,52 @@ Verified on real hardware (frames captured from the board's VGA output):
 | Keyboard | ESP32 NanoLink86, PS/2 clock/data (bit-banged by the ESP32) |
 | Configuration | Atmel AT45DB161D SPI flash (JTAG: Platform Cable USB II) |
 
-### Pins (see `src/ddr_186.ucf`)
+### Pin Assignment & Hardware Wiring
 
-| Signal | FPGA pin | Note |
+The design connects to external peripherals via the Spartan-3A Starter Kit's 6-pin expansion headers (**Pmod J18** for the microSD module and **Pmod J20** for the ESP32 keyboard).
+
+<p align="center">
+  <img src="assets/spartan3a_sd_module.jpg" width="48%" alt="DFRobot MicroSD Module V1.0 wiring" />
+  <img src="assets/spartan3a_pmod_wiring.jpg" width="48%" alt="Spartan-3A Starter Kit Pmod J18 and J20 wiring" />
+</p>
+<p align="center"><em>Physical wiring: DFRobot MicroSD Module V1.0 (left) connected to Spartan-3A Pmod J18 (right), and ESP32 connected to Pmod J20.</em></p>
+
+#### 1. MicroSD Module Wiring (Pmod J18)
+
+The board uses an external **DFRobot MicroSD Module V1.0** operating in SPI mode connected to header **J18**:
+
+| J18 Header Pin | FPGA Pin (`ddr_186.ucf`) | Net Name | DFRobot Module Pin | SPI Signal / Function | Reference Wire Color |
+| :---: | :---: | :--- | :--- | :--- | :--- |
+| **Pin 1** | `AA21` | `SD_CS` | **SS** | SPI Chip Select (Active Low) | 🟤 **Brown** |
+| **Pin 2** | `AB21` | `SD_DI` | **MOSI** | Master Out / Slave In (FPGA to SD) | ⚪ **White** |
+| **Pin 3** | `AA19` | `SD_CK` | **SCK** | SPI Serial Clock | 🔵 **Blue** |
+| **Pin 4** | `AB19` | `SD_DO` | **MISO** | Master In / Slave Out (SD to FPGA) | 🟡 **Yellow** |
+| **Pin 5** | `GND`  | `GND`   | **GND** | Ground | ⚫ **Black** |
+| — | — | `VCC` | **+5V** | Module Power Supply (+5V rail / VCC) | 🔴 **Red** |
+
+> [!NOTE]
+> The DFRobot MicroSD Module V1.0 includes an on-board 3.3V LDO regulator and level shifting circuitry. Connect its **+5V** pin (Red wire) to a 5V power rail (or VCC) and **GND** to common ground. When powered, the on-board red LED lights up.
+
+#### 2. ESP32 Keyboard Connection (Pmod J20)
+
+The ESP32 runs the exact same firmware as the Tang Nano 9K version (`esp32/main.py` or `esp32/esp32_wifi.py`). It bit-bangs PS/2 scan code set 2 directly to header **J20**:
+
+| J20 Header Pin | FPGA Pin (`ddr_186.ucf`) | Net Name | ESP32 Pin | Function | Reference Wire Color |
+| :---: | :---: | :--- | :--- | :--- | :--- |
+| **Pin 1** | `V14` | `PS2_CLK1` | **GPIO 18** | Bit-banged PS/2 Clock | 🔵 **Blue** |
+| **Pin 2** | `V15` | `PS2_DATA1` | **GPIO 19** | Bit-banged PS/2 Data | 🟡 **Yellow** |
+| **Pin 5** | `GND` | `GND` | **GND** | Common Ground | Common GND |
+
+The BIOS in this design expects scan code set 1, so `KB_8042.v` translates set 2 to set 1 inside the FPGA. That is why the ESP32 firmware needs zero modification.
+
+#### 3. Other Board I/O
+
+| Signal | FPGA Pin | Description |
 | :--- | :---: | :--- |
-| `PS2_CLK1` / `PS2_DATA1` | V14 / V15 | keyboard channel, connected to the ESP32 (Pmod J20 pins 1 and 2) |
-| `PS2_CLK2` / `PS2_DATA2` | W12 / V11 | second channel (mouse), on-board PS/2 port |
-| `SD_CS` | AA21 | microSD SPI chip select |
-| `SD_DI` | AB21 | data from FPGA to card |
-| `SD_CK` | AA19 | SPI clock |
-| `SD_DO` | AB19 | data from card to FPGA |
-| `sys_clk_in` / `CLK_50MHZ` | V12 / E12 | 133 MHz and 50 MHz clocks |
-
-### ESP32 connection
-
-Same firmware as the Tang Nano 9K version (`esp32/main.py` or `esp32/esp32_wifi.py`): the ESP32
-bit-bangs PS/2 scan code set 2 on **GPIO 18 (clock)** and **GPIO 19 (data)**. Connect these to
-`PS2_CLK1` / `PS2_DATA1` (V14 / V15) and share GND.
-
-The BIOS in this design expects scan code set 1, so `KB_8042.v` translates set 2 to set 1 inside
-the FPGA. That is why the ESP32 needs no change.
+| `PS2_CLK2` / `PS2_DATA2` | `W12` / `V11` | Second PS/2 channel (mouse), routed to the on-board female PS/2 jack |
+| `sys_clk_in` / `CLK_50MHZ` | `V12` / `E12` | 133 MHz oscillator and on-board 50 MHz clock |
+| `VGA_R[3:0]`, `VGA_G[3:0]`, `VGA_B[3:0]` | On-board | 12-bit DAC routed to the on-board DB15 VGA connector |
+| `VGA_HSYNC` / `VGA_VSYNC` | `C11` / `B11` | VGA synchronization signals |
 
 ---
 
