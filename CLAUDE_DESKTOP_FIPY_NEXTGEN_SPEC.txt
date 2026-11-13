@@ -1,0 +1,133 @@
+================================================================================
+           PROJECT SPECIFICATION & ARCHITECTURE PROMPT FOR CLAUDE DESKTOP
+   Next-Gen Open-Source Multi-Protocol IoT Board (FiPy 2.0 / Universal Radio)
+================================================================================
+Author: Nikolaos Tsalaris (Tslrs) - ECE UOWM
+Target Form Factor: 55 mm x 20 mm (Standard Breadboard Friendly, FiPy / Pico Pinout)
+EDA Suite: KiCad 8.x
+Date: November 2026
+================================================================================
+
+[SYSTEM INSTRUCTION FOR CLAUDE DESKTOP]
+Copy and paste this entire text into your Claude Desktop Project or Chat:
+"You are acting as the Chief RF and Embedded Hardware Engineer for Nikolaos
+Tsalaris. You will assist in designing, calculating, verifying, and routing in
+KiCad 8 a next-generation open-source multi-radio IoT board inspired by the Pycom
+FiPy, featuring zero RF interference, industrial reliability, and embedded eSIM."
+
+================================================================================
+1. PROJECT OVERVIEW & GOAL
+================================================================================
+The objective is to design a high-end, open-source, ultra-compact (55 x 20 mm)
+multi-radio IoT development board. It modernizes the legacy Pycom FiPy by:
+1. Eliminating physical plastic nano-SIM slots in favor of an on-board soldered eSIM.
+2. Replacing delicate u.FL connectors with rugged, screw-on SMA connectors.
+3. Upgrading wireless modems to current generation standards (SX1262, Wi-Fi 6, Zigbee 3.0).
+4. Solving all RF cross-talk and power-rail interference through advanced 4-layer
+   PCB layout, RF shielding cans, and SAW bandpass filtering.
+
+================================================================================
+2. DETAILED BILL OF MATERIALS (BOM) & COMPONENT SELECTION
+================================================================================
+
+A. Main Compute Unit (Host MCU):
+   - Primary: Raspberry Pi RP2350 (Dual ARM Cortex-M33 / Hazard3 RISC-V @ 150MHz,
+     520KB SRAM, hardware security, TrustZone, 8MB External QSPI Flash).
+   - Alternative Option: Espressif ESP32-S3-WROOM-1 (Dual Xtensa LX7, 8MB PSRAM).
+
+B. Cellular & Global Cloud Connectivity (4G LTE-M / NB-IoT / 2G):
+   - Module: Quectel BG95-M3 or SIMCom SIM7080G (LGA module).
+   - Features: Global multi-band LTE Cat M1 / Cat NB2 / EGPRS. Ultra-low power sleep.
+   - Embedded SIM (eSIM): STMicroelectronics ST4SIM-200M (Industrial MFF2 package,
+     5x6mm DFN-8). Pre-provisioned for global roaming over cellular networks.
+
+C. Long-Range Sub-GHz Radio (LoRa):
+   - Transceiver: Semtech SX1262 (QFN-24).
+   - Frequency: 868 MHz (Europe) / 915 MHz (US).
+   - RF Performance: Up to +22 dBm output power, -148 dBm sensitivity.
+   - RF Protection: On-board SAW Filter (EPCOS/TDK B39871B3725U410 or similar 868MHz bandpass).
+   - Antenna Connector: Edge-mount SMA female connector (rugged, screw-on).
+
+D. 2.4 GHz Multi-Protocol Co-Processor (Wi-Fi 6 + BLE 5 + Zigbee 3.0 + Thread):
+   - RF SoC: Espressif ESP32-C6FH4 (QFN-32, 4MB embedded flash).
+   - Protocols: 802.11ax (Wi-Fi 6 @ 2.4GHz), Bluetooth 5 (LE) + Mesh, Zigbee 3.0,
+     Matter, and OpenThread.
+   - Interface to RP2350 Host: High-speed SPI + UART + GPIO control lines.
+   - Antenna: Ceramic chip antenna (Johanson 2450AT18D0100) with matching network.
+
+E. Power Management (PMIC) & Battery Subsystem:
+   - Buck Converter (DC-DC): Texas Instruments TPS62088 (3A continuous, 4A peak,
+     2.4MHz step-down). Essential for suppressing voltage drops during LTE 2A transmit bursts.
+   - Low-Noise LDO (for sensitive Analog/RF blocks): Microchip MIC5365 (3.3V, 150mA, ultra-low ripple).
+   - LiPo Charger & Power Path: TI BQ24075 (USB / Battery power path management with dynamic
+     system power management and thermal regulation).
+   - USB Interface: USB Type-C connector with ESD protection (USBLC6-2SC6) and CC pull-downs.
+
+================================================================================
+3. ZERO-INTERFERENCE RF DESIGN & SHIELDING STRATEGY
+================================================================================
+Operating 4G (800-900MHz), LoRa (868MHz), and 2.4GHz (Wi-Fi/BLE/Zigbee) on a
+tiny 55x20mm PCB causes massive cross-talk unless these exact rules are enforced:
+
+1. 4-Layer PCB Stackup:
+   - Layer 1 (Top Layer): Controlled impedance RF traces (50 Ohm coplanar waveguide),
+     critical high-speed traces, and active IC components.
+   - Layer 2 (Ground Plane): SOLID, UNBROKEN COPPER GROUND PLANE (GND). Zero traces
+     crossing underneath RF transmission lines! Acts as a shield barrier.
+   - Layer 3 (Power Plane): 3.3V System, 3.8V Cellular power rails, and battery voltage.
+   - Layer 4 (Bottom Layer): Digital control signals (SPI, I2C, UART, GPIOs) and passive passives.
+
+2. Physical RF Shielding Cans (Metal Shields):
+   - Place two standard soldered metal shielding cans (SMD shielding frames + clips):
+     * Can #1: Enclosing the Quectel LTE modem and its immediate RF front-end.
+     * Can #2: Enclosing the Semtech SX1262 LoRa transceiver and crystal oscillator.
+   - These prevent high-power cellular harmonic radiation from coupling into the sensitive
+     LoRa receiver front-end.
+
+3. Out-of-Band Filtering:
+   - The LoRa RF output MUST pass through an 868 MHz SAW bandpass filter before reaching
+     the antenna. This attenuates LTE Band 20 (791-862 MHz) signals by >40 dB, preventing
+     cellular transmissions from blinding the LoRa receiver.
+
+4. Spatial Antenna Separation:
+   - Cellular antenna connection: Positioned at Board Edge A.
+   - LoRa SMA antenna connection: Positioned at Board Edge B (opposite side).
+   - 2.4 GHz ceramic antenna: Positioned in an isolated corner with continuous keep-out
+     areas on all copper layers directly underneath the antenna radiator.
+
+5. Via Stitching / Via Fencing:
+   - Place ground stitching vias spaced lambda/20 (approx. 1.0 to 1.5 mm apart) along the
+     entire length of all 50 Ohm RF coplanar waveguides to confine electromagnetic fields.
+
+6. Coexistence Signaling (Hardware Coex):
+   - Dedicated hardware lines between the Cellular modem and ESP32-C6 (TX_ACTIVE, STATUS,
+     PRIORITY) to enable Time-Division Multiplexing (TDM) during heavy traffic.
+
+================================================================================
+4. PINOUT & MECHANICAL FORM FACTOR
+================================================================================
+- Dimensions: 55.0 mm length x 20.0 mm width.
+- Headers: Dual-row 2.54mm (0.1") pitch pin headers, 28 pins total (14 pins per side).
+- Spacing: Standard 0.7" (17.78 mm) row spacing, 100% compatible with standard solderless breadboards.
+- Mounting: Dual M2 screw mounting holes at opposite corners.
+
+================================================================================
+5. INSTRUCTIONS TO EXECUTE WITH CLAUDE DESKTOP
+================================================================================
+When you feed this document into Claude Desktop, you can ask Claude to:
+
+Task 1: "Generate the complete KiCad 8 schematic netlist and hierarchy for the RP2350
+and Semtech SX1262 LoRa section, including decoupling capacitor values."
+
+Task 2: "Calculate the exact 50-Ohm Coplanar Waveguide with Ground (CPW-G) track width
+and gap for a standard JLCPCB / PCBWay 4-layer 7628 stackup (1.6mm thickness)."
+
+Task 3: "Provide the complete Python / MicroPython initialization code for the Quectel
+cellular modem using AT commands to connect to the ST4SIM eSIM."
+
+Task 4: "Review my KiCad PCB layout rules and check the grounding scheme for the RF
+shielding frames."
+
+================================================================================
+END OF SPECIFICATION FILE - READY FOR CLAUDE DESKTOP
+================================================================================
