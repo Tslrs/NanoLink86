@@ -206,31 +206,25 @@ was not observed to cause problems (memory test and the games run correctly).
 
 ---
 
-## How it was verified (capture card + Claude)
+## How it was verified (Capture Card + Claude Loop)
 
-Like the Tang Nano version, the work was done in a hardware loop with an AI assistant and no lab
-instruments: the board's **VGA output was plugged into a USB video capture card** (MacroSilicon
-`534D:2109`), and **Claude** (Anthropic, through Claude Code) grabbed frames with OpenCV
-(`tools/cap.py`), read what the FPGA was displaying, wrote a new test program in x86 assembly,
-patched it into the bitstream, flashed it over JTAG, and looked at the next frame.
+Like the Tang Nano version, verification was conducted using an automated closed-loop hardware pipeline: the board's **VGA output was plugged into a USB video capture card** (MacroSilicon `534D:2109`), and **Claude** (Anthropic, through Claude Code) grabbed frames with OpenCV, analyzed displayed framebuffers in real time, wrote new test routines in x86 assembly, patched verification patterns into the bitstream, flashed them over JTAG, and evaluated the response on the next frame.
 
 That loop was used to:
 
 * run memory tests and show their result as text on screen;
 * print SD card responses (CMD0/CMD8/ACMD41, OCR, CSD, partition table) as hex on screen, which
   showed a wrong BIOS patch (only the first byte of each SD command was being sent);
-* confirm the FreeDOS boot, keyboard input and the games, and record the demo videos (`tools/rec.py`).
+* confirm the FreeDOS boot, keyboard input and the games, and record the demo videos.
 
-Toolchain: Xilinx ISE 14.7 inside an Ubuntu 14.04 VM (UTM on an Apple-silicon Mac), Xilinx
-Platform Cable USB II, iMPACT in batch mode.
+Toolchain: Xilinx ISE 14.7 inside an Ubuntu VM, Xilinx Platform Cable USB II, iMPACT in batch mode.
 
 ## Credits and license
 
 * **Next186 SoC PC**: Nicolae Dumitrache (OpenCores, <http://opencores.org/project,next186>).
 * **Spartan-3AN port used as the starting point**: tmatsuya (<https://github.com/tmatsuya/next186_soc_pc>).
 * **NanoLink86 ESP32 keyboard and relay**: Tslrs (this repository).
-* **Spartan-3A adaptation**: Tslrs, developed with AI assistance (Claude by Anthropic; an earlier
-  session with another AI assistant produced the first experimental test code).
+* **Spartan-3A adaptation & verification**: Tslrs, developed with AI engineering assistance (Claude by Anthropic & Google Antigravity).
 
 The Verilog files derived from Next186 keep their original copyright headers (GNU LGPL 2.1 or
 later). Provided "as is", without warranty; wire and flash hardware at your own risk.

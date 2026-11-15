@@ -1,27 +1,70 @@
 # ======================================================================
-# NanoLink86 .gitignore
+# NanoLink86 .gitignore - Production Grade & Clean
 # ======================================================================
 
-# Presentation & Keynote (Keep local, do not upload)
+# --- Private Notes, Papers & Presentation Decks (Kept in private_notes) ---
+/*.txt
+private*/
+notes/
+drafts/
+paper/
+presentations/
+docs/presentation/
 *.pptx
 *.ppt
 *.key
 
-# Sensitive Runtime Configurations & Logs (No Passwords / No Audit Leak)
+# --- Local Tools & Scratch Server Scripts ---
+tools/
+scripts/scratch*
+/server.py
+
+# --- Sensitive Runtime Configurations & Credentials (No Leaks) ---
 wifi_config.json
 server_config.json
 server_stats.json
 audit_log.json
 *.log
+*.env
+.env*
 
-# Python Cache & OS Artifacts
+# --- Python Cache & Virtual Environments ---
 __pycache__/
 *.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# --- macOS System Junk & Temp Files ---
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
 
-# Screen capture artifacts
+# --- Editors & IDE Configurations ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Screen Captures & Test Artifacts ---
 current_screen.jpg
+test_*.png
+test_*.jpg
+scratch/
+temp/
+tmp/
 
-# Root legacy server scratch
-/server.py
+# --- EDA / FPGA Build Logs & Synthesis Scrap ---
+*.jou
+*.str
+*.rpt
+*.tcl.bak
+_xmsgs/
+xst/
+impl/

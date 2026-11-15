@@ -183,22 +183,18 @@ Measured & calculated via Gowin EDA V1.9.12 Power Analysis Report (`Next186_S.po
 
 ---
 
-## 🛠️ How We Built & Fixed It (Antigravity AI + Hardware Loop)
+## 🛠️ How We Built & Fixed It (Antigravity AI + Claude + Hardware Loop)
 
-Designed and debugged by **Tslrs** (Hardware & Architecture) collaborating with **Google Antigravity** (AI Engineering Partner):
+Architected and engineered by **Tslrs** (Nikolaos Tsalaris - Department of ECE, UOWM) in direct collaboration with **Google Antigravity AI** & **Claude** (AI Engineering Partners):
 
 * **1. Fixed the SD Card Reading (FPGA)**:  
-  The original project struggled to read the MicroSD card under modern Gowin EDA. We fixed the FPGA IO constraints and SPI bus pull-ups so the Tang Nano 9K reliably detects and boots FreeDOS from the TF card slot every single time (using Raspberry Pi Imager).
-* **2. Fixed the Keyboard via HDMI Capture**:  
-  To solve keyboard timing issues without expensive lab tools, we plugged the Tang Nano 9K HDMI output into a budget **DM-HF200 USB Video Capture Card**. Antigravity captured live screen frames in real-time, watched FreeDOS execute commands on screen, and verified scan code execution visually.
-* **3. Engineered the ESP32 Co-Processor (Antigravity Code Generation)**:  
-  Antigravity generated native Xtensa Viper machine code for the ESP32 to bit-bang IBM AT PS/2 Set 2 frames at an exact **12.5 kHz** clock speed, while simultaneously handling Bluetooth Low Energy (BLE NUS) and Web Serial USB connections from the browser with zero buffer lag.
-* **4. Spartan-3A port (Claude + capture-card loop)**:
-  The Spartan-3A version was debugged the same way with **Claude** (Anthropic): the board's VGA
-  output goes into a USB capture card, Claude reads the captured frames with OpenCV, writes small
-  x86 test programs that print memory-test results and SD card responses on the screen, patches
-  them into the bitstream, flashes the board over JTAG and checks the next frame. This found the
-  `bios_cs_d` bug in `ddr_186.v` and a wrong BIOS patch for the SD card.
+  The original project struggled to read the MicroSD card under modern Gowin EDA. We fixed the FPGA IO constraints and SPI bus pull-up configurations so the Tang Nano 9K reliably detects and boots FreeDOS from the TF card slot every single time.
+* **2. Closed-Loop Optical Verification via HDMI Capture (Google Antigravity AI Vision Loop)**:  
+  To solve bus and keyboard timing issues deterministically without expensive lab tools, we plugged the Tang Nano 9K HDMI output into a budget **DM-HF200 USB Video Capture Card**. Google Antigravity captured live screen frames in real time, monitored FreeDOS executing commands on screen, and verified scan code execution visually.
+* **3. Engineered the ESP32 Co-Processor (Antigravity High-Speed Firmware)**:  
+  Developed native Xtensa machine code for the ESP32 to bit-bang IBM AT PS/2 Set 2 frames at an exact **12.5 kHz** clock speed, while simultaneously handling Bluetooth Low Energy (BLE NUS) and Web Serial USB connections from the browser with zero buffer latency.
+* **4. Spartan-3A Port (Claude + Capture-Card Hardware Loop)**:
+  The Spartan-3A port was debugged in an automated closed-loop with **Claude** (Anthropic): the board's VGA output feeds into a USB capture card, Claude analyzes captured frames with OpenCV, writes small x86 diagnostic test routines that print memory and SD card status on screen, patches them into the bitstream, flashes the board over JTAG, and verifies the next frame. This pinpointed the `bios_cs_d` bug in `ddr_186.v` and resolved the SD card BIOS patch.
 
 ---
 
